@@ -7,16 +7,21 @@ project(
     'werror': true,
     'b_pie': true,
     'c_std': 'c23',
-    'b_sanitize': [
-      'address',
-      'undefined',
-      'leak',
-    ],
-    'b_lundef': false, # mesons says sanitizers can't handle this
+    'b_lundef': false, # meson says sanitizers can't handle this
   },
   meson_version: '>=1.10.0',
 )
 cc = meson.get_compiler('c')
+
+# sanitizers are not supported on Windows; leak sanitizer is Linux-only
+if host_machine.system() != 'windows'
+  sanitize_flags = ['-fsanitize=address,undefined']
+  if host_machine.system() != 'darwin'
+    sanitize_flags += ['-fsanitize=leak']
+  endif
+  add_project_arguments(sanitize_flags, language: 'c')
+  add_project_link_arguments(sanitize_flags, language: 'c')
+endif
 
 if get_option('buildtype') == 'release'
   add_project_arguments(
