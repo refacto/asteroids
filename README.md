@@ -1,0 +1,44 @@
+# Asteroids
+
+An Asteroids clone written in C using [raylib](https://www.raylib.com/).
+
+## Dependencies
+
+- [raylib](https://www.raylib.com/) 5.5+
+- [Meson](https://mesonbuild.com/) 1.10+
+- [Ninja](https://ninja-build.org/)
+- A C23-capable compiler (clang, gcc might work too)
+
+### Installing dependencies
+
+**macOS (Homebrew):**
+```sh
+brew install raylib meson
+```
+
+**Linux:**
+```sh
+pip install meson
+# Also install raylib from source: https://github.com/raysan5/raylib.git
+```
+
+## Building
+
+```sh
+meson setup build
+meson compile -C build
+```
+
+The compiled binary will be at `build/asteroids`.
+
+To build a release:
+```sh
+meson setup build --buildtype=release
+meson compile -C build
+```
+
+## Running
+
+```sh
+./build/asteroids
+```
