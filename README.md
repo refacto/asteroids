@@ -42,3 +42,17 @@ meson compile -C build
 ```sh
 ./build/asteroids
 ```
+
+## Code formatting
+
+The project uses [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce a consistent code style.
+
+To format all C files:
+```sh
+clang-format -i main.c
+```
+
+To check formatting without modifying files (as CI does):
+```sh
+clang-format --dry-run --Werror main.c
+```

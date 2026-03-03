@@ -7,6 +7,23 @@ on:
     branches: [main]
 
 jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh
+          CLANG_FORMAT=$(ls /usr/bin/clang-format-* | sort -V | tail -1)
+          sudo ln -sf "$CLANG_FORMAT" /usr/local/bin/clang-format
+
+      - name: Check formatting
+        run: clang-format --dry-run --Werror main.c
+
   build:
     strategy:
       matrix:
