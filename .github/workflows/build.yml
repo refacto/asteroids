@@ -1,4 +1,4 @@
-name: Build the game
+name: Check Asteroids
 
 on:
   push:
