@@ -1,0 +1,9 @@
+#!/bin/sh
+# Formats staged .c/.h files with clang-format before committing.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(c|h)$')
+
+if [ -n "$staged" ]; then
+    clang-format -i $staged
+    git add $staged
+fi

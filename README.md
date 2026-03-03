@@ -56,3 +56,11 @@ To check formatting without modifying files (as CI does):
 ```sh
 clang-format --dry-run --Werror main.c
 ```
+
+### Git hook
+
+A pre-commit hook is included in `.githooks/` that automatically formats staged `.c`/`.h` files before each commit. To install it:
+
+```sh
+git config core.hooksPath .githooks
+```
