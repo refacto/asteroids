@@ -29,7 +29,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install -y ninja-build pkg-config cmake \
+          sudo apt install -y ninja-build cmake \
             libasound2-dev libx11-dev libxrandr-dev libxi-dev \
             libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev \
             libxinerama-dev libwayland-dev libxkbcommon-dev
@@ -40,7 +40,7 @@ jobs:
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install meson ninja raylib
+        run: brew install meson raylib
 
       - name: Build
         run: |
