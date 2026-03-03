@@ -16,12 +16,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Clang (LLVM PPA)
+        if: runner.os == 'Linux'
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh
+          CLANG=$(ls /usr/bin/clang-* | grep -E 'clang-[0-9]+$' | sort -V | tail -1)
+          echo "CC=$CLANG" >> $GITHUB_ENV
+
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install -y ninja-build pkg-config libraylib-dev
+          sudo apt install -y ninja-build pkg-config cmake \
+            libasound2-dev libx11-dev libxrandr-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev \
+            libxinerama-dev libwayland-dev libxkbcommon-dev
           pip install meson
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+          sudo cmake --build /tmp/raylib/build --target install
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
