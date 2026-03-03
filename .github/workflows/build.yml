@@ -18,7 +18,7 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh
-          CLANG_FORMAT=$(ls /usr/bin/clang-format-* | sort -V | tail -1)
+          CLANG_FORMAT=$(ls /usr/bin/clang-format-* | grep -E 'clang-format-[0-9]+$' | sort -V | tail -1)
           echo "CLANG_FORMAT=$CLANG_FORMAT" >> $GITHUB_ENV
 
       - name: Check formatting
