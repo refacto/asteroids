@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+UseTab: ForContinuationAndIndentation
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: true
+# those two need to sync up, else clang doesn't convert spaces to tabs
+IndentWidth: 4
+TabWidth: 4
+AllowShortFunctionsOnASingleLine: Empty
