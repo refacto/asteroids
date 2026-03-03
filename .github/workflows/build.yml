@@ -19,10 +19,10 @@ jobs:
           chmod +x llvm.sh
           sudo ./llvm.sh
           CLANG_FORMAT=$(ls /usr/bin/clang-format-* | sort -V | tail -1)
-          sudo ln -sf "$CLANG_FORMAT" /usr/local/bin/clang-format
+          echo "CLANG_FORMAT=$CLANG_FORMAT" >> $GITHUB_ENV
 
       - name: Check formatting
-        run: clang-format --dry-run --Werror main.c
+        run: $CLANG_FORMAT --dry-run --Werror main.c
 
   build:
     strategy:
