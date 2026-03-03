@@ -1,0 +1,15 @@
+# Meson build dir
+build/
+
+# Compiled output
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# macOS
+.DS_Store
+
+# clangd / compile commands (generated)
+compile_commands.json
