@@ -24,9 +24,9 @@ pip install meson
 
 **Windows ([MSYS2](https://www.msys2.org/)):**
 
-Install [MSYS2](https://www.msys2.org/), then open the **UCRT64** shell and run:
+Install [MSYS2](https://www.msys2.org/), then open the **CLANG64** shell and run:
 ```sh
-pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-raylib
+pacman -S mingw-w64-clang-x86_64-clang mingw-w64-clang-x86_64-meson mingw-w64-clang-x86_64-raylib
 ```
 
 ## Building
