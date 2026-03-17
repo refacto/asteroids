@@ -22,6 +22,13 @@ pip install meson
 # Also install raylib from source: https://github.com/raysan5/raylib.git
 ```
 
+**Windows ([MSYS2](https://www.msys2.org/)):**
+
+Install [MSYS2](https://www.msys2.org/), then open the **UCRT64** shell and run:
+```sh
+pacman -S mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-raylib
+```
+
 ## Building
 
 ```sh
@@ -29,7 +36,7 @@ meson setup build
 meson compile -C build
 ```
 
-The compiled binary will be at `build/asteroids`.
+The compiled binary will be at `build/asteroids` (or `build/asteroids.exe` on Windows).
 
 To build a release:
 ```sh
