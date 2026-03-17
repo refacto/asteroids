@@ -27,7 +27,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -59,7 +59,22 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install meson raylib
 
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          install: mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-raylib
+
       - name: Build
+        if: runner.os != 'Windows'
+        run: |
+          meson setup build
+          meson compile -C build
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
         run: |
           meson setup build
           meson compile -C build
