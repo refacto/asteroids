@@ -50,7 +50,7 @@ void asteroid_add(struct Asteroid *head, struct Asteroid *new);
 // get the next asteroid element from the list
 struct Asteroid *asteroid_next(const struct Asteroid *asteroid);
 
-void asteroid_setNext(struct Asteroid *asteroid, struct Asteroid *next);
+void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 
 // draws the asteroid
 void asteroid_draw(struct Asteroid *asteroid);

@@ -11,7 +11,7 @@ int main(void) {
 	SetTargetFPS(60);
 
 	struct Game *game = &(struct Game){};
-	game_init(game);
+	game_init(game, screenWidth, screenHeight);
 
 	while (!WindowShouldClose()) {
 		game_update(game);

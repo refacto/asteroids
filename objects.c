@@ -54,7 +54,7 @@ void asteroid_add(struct Asteroid *head, struct Asteroid *new) {
 	head->next = new;
 }
 
-void asteroid_setNext(struct Asteroid *asteroid, struct Asteroid *next) {
+void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next) {
 	asteroid->next = next;
 }
 
