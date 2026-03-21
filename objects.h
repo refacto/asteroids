@@ -17,4 +17,9 @@ struct Asteroid {
 
 struct Player {
 	struct Object object;
+	int lifes;
 };
+
+void asteroid_init(struct Asteroid *asteroid);
+
+void player_init(struct Player *player);

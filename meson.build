@@ -62,6 +62,6 @@ raylib = dependency('raylib')
 
 srcs = [
   'main.c',
-  'objects.h',
+  'objects.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])
