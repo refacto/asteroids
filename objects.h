@@ -5,7 +5,8 @@
 struct Object {
 	Vector2 position;
 	Vector2 velocity;
-	float acceleration;
+	float acceleration_factor; // [0;1]
+	float max_velocity;
 	Color color;
 	float rotation;
 };
@@ -30,12 +31,30 @@ struct Player {
 	int lives;
 };
 
-void asteroid_init(struct Asteroid *asteroid);
+// moves an object, adjusting its speed based on acceleration
+void object_move(struct Object *obj);
 
-void player_init(struct Player *player);
+// wraps an object around the screen.
+// wrap_offset describes the padding that's added to avoid jumping
+void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
+						float wrap_offset);
+
+void asteroid_init(struct Asteroid *asteroid);
 
 // check if asteroid list has a next element
 bool asteroid_has_next(const struct Asteroid *asteroid);
 
+// add new to end of asteroid list, rooted at head
+void asteroid_add(struct Asteroid *head, struct Asteroid *new);
+
 // get the next asteroid element from the list
 struct Asteroid *asteroid_next(const struct Asteroid *asteroid);
+
+void asteroid_setNext(struct Asteroid *asteroid, struct Asteroid *next);
+
+// draws the asteroid
+void asteroid_draw(struct Asteroid *asteroid);
+
+void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
+
+void player_init(struct Player *player);
