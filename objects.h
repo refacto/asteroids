@@ -15,8 +15,16 @@ struct Asteroid {
 	float radius;
 };
 
+struct Shot {
+	struct Object object;
+	bool active;
+};
+
+constexpr int MAX_NUM_SHOTS = 5;
+
 struct Player {
 	struct Object object;
+	struct Shot shots[MAX_NUM_SHOTS];
 	int lifes;
 };
 
