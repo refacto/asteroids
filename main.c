@@ -1,19 +1,27 @@
+#include "game.h"
+
 #include "raylib.h"
+#include <stdlib.h>
 
 int main(void) {
 	const int screenWidth = 800;
 	const int screenHeight = 450;
 
 	InitWindow(screenWidth, screenHeight, "Asteroids");
-
 	SetTargetFPS(60);
 
-	while (!WindowShouldClose()) {
-		BeginDrawing();
+	struct Game *game = &(struct Game){};
+	game_init(game, screenWidth, screenHeight);
 
+	while (!WindowShouldClose()) {
+		game_update(game);
+
+		BeginDrawing();
+		game_draw(game);
 		EndDrawing();
 	}
 
+	game_destroy(game);
 	CloseWindow();
-	return 0;
+	return EXIT_SUCCESS;
 }
