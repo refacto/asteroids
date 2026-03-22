@@ -4,7 +4,7 @@
 
 struct Object {
 	Vector2 position;
-	Vector2 speed;
+	Vector2 velocity;
 	float acceleration;
 	Color color;
 	float rotation;
