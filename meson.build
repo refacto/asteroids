@@ -27,7 +27,7 @@ if get_option('buildtype') == 'release'
   add_project_arguments(
     cc.get_supported_arguments(
       [
-        '-U_FORTIFY_SOURCE',   # first undefine it since it is already defined on macOS
+        '-U_FORTIFY_SOURCE', # first undefine it since it is already defined on macOS
         '-D_FORTIFY_SOURCE=3', # incompatible with sanitizers, so do it in the release build
       ],
     ),
@@ -62,5 +62,6 @@ raylib = dependency('raylib')
 
 srcs = [
   'main.c',
+  'objects.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])
