@@ -25,7 +25,7 @@ constexpr int MAX_NUM_SHOTS = 5;
 struct Player {
 	struct Object object;
 	struct Shot shots[MAX_NUM_SHOTS];
-	int lifes;
+	int lives;
 };
 
 void asteroid_init(struct Asteroid *asteroid);
