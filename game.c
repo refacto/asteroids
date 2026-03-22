@@ -52,7 +52,7 @@ void game_update(struct Game *game) {
 }
 
 void game_draw(struct Game *game) {
-	ClearBackground(RAYWHITE);
+	ClearBackground(BLACK);
 	struct Asteroid *cur = game->asteroids;
 	while (cur) {
 		asteroid_draw(cur);
