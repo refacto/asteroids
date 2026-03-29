@@ -1,4 +1,5 @@
 #include "game.h"
+#include "player.h"
 #include <raylib.h>
 #include <stdlib.h>
 
@@ -45,6 +46,7 @@ void game_update(struct Game *game) {
 		asteroid_move(cur, game->screen_dimensions);
 		cur = cur->next;
 	}
+	player_update(&game->player);
 }
 
 void game_draw(struct Game *game) {
@@ -54,4 +56,5 @@ void game_draw(struct Game *game) {
 		asteroid_draw(cur);
 		cur = cur->next;
 	}
+	player_draw(&game->player);
 }
