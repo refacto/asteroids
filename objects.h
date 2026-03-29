@@ -1,6 +1,7 @@
 #pragma once
 
 #include "raylib.h"
+#include <math.h>
 
 struct Object {
 	Vector2 position;
@@ -30,6 +31,13 @@ void object_move(struct Object *obj);
 // wrap_offset describes the padding that's added to avoid jumping
 void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
 						float wrap_offset);
+
+// transform a given vector into the global coordinate system
+// applying rotation and position offset
+Vector2 object_transform_vec(struct Object *obj, Vector2 vec);
+
+// rotate by delta (in deg)
+void object_rotate(struct Object *obj, float delta);
 
 void asteroid_init(struct Asteroid *asteroid);
 
