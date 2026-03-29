@@ -85,3 +85,17 @@ void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
 	}
 	obj->position = newPos;
 }
+
+Vector2 object_transform_vec(struct Object *obj, Vector2 vec) {
+	Vector2 rotated = Vector2Rotate(vec, obj->rotation * DEG2RAD);
+	return Vector2Add(rotated, obj->position);
+}
+
+void object_rotate(struct Object *obj, float delta) {
+	float next = fmodf(obj->rotation + delta, 360);
+	// make sure we stay positive, fmodf keeps the sign of the first arg
+	if (next < 0) {
+		next += 360;
+	}
+	obj->rotation = next;
+}
