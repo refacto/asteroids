@@ -5,12 +5,7 @@
 #include <stdio.h>
 
 constexpr float ASTEROID_LARGE_RADIUS = 40.0f;
-constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr int ASTEROID_MAX_VELOCITY = 4;
-
-void player_init(struct Player *player) {
-	*player = (struct Player){.lives = PLAYER_STARTING_LIVES};
-}
 
 static Vector2 random_velocity(int speed) {
 	int deg = GetRandomValue(0, 360);

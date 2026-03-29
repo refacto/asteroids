@@ -23,14 +23,6 @@ struct Shot {
 	bool active;
 };
 
-constexpr int MAX_NUM_SHOTS = 5;
-
-struct Player {
-	struct Object object;
-	struct Shot shots[MAX_NUM_SHOTS];
-	int lives;
-};
-
 // moves an object, adjusting its speed based on acceleration
 void object_move(struct Object *obj);
 
@@ -56,5 +48,3 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 void asteroid_draw(struct Asteroid *asteroid);
 
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
-
-void player_init(struct Player *player);
