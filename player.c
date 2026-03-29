@@ -39,6 +39,8 @@ void player_draw(unused struct Player *player) {
 	Vector2 right = object_transform_vec(
 		&player->object, (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
 	DrawTriangleLines(head, left, right, DARKBLUE);
+	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
+			   3, BLUE);
 }
 void player_move(unused struct Player *player,
 				 unused Vector2 screen_dimensions) {}
