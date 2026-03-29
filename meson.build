@@ -63,6 +63,7 @@ raylib = dependency('raylib')
 srcs = [
   'main.c',
   'game.c',
+  'screenController.c',
   'objects.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])

@@ -2,6 +2,8 @@
 #include <raylib.h>
 #include <stdlib.h>
 
+#define unused [[maybe_unused]]
+
 static Vector2 random_location(Vector2 screen_dimensions) {
 	return (Vector2){
 		.x = (float)GetRandomValue(0, (int)screen_dimensions.x),
@@ -54,4 +56,12 @@ void game_draw(struct Game *game) {
 		asteroid_draw(cur);
 		cur = cur->next;
 	}
+}
+
+void game_screen_update(unused struct ScreenController *ctrl, void *data) {
+	game_update((struct Game *)data);
+}
+
+void game_screen_draw(unused struct ScreenController *ctrl, void *data) {
+	game_draw((struct Game *)data);
 }
