@@ -10,3 +10,6 @@ struct Player {
 };
 
 void player_init(struct Player *player);
+void player_update(struct Player *player);
+void player_draw(struct Player *player);
+void player_move(struct Player *player, Vector2 screen_dimensions);
