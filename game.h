@@ -1,5 +1,5 @@
 #pragma once
-#include "objects.h"
+#include "player.h"
 #include <raylib.h>
 
 struct Game {
