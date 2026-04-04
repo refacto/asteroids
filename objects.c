@@ -22,7 +22,7 @@ void asteroid_init(struct Asteroid *asteroid) {
 			{
 				.velocity = random_velocity(1),
 				.max_velocity = ASTEROID_MAX_VELOCITY,
-				.acceleration_factor = 1,
+				.thrust = 0,
 			},
 	};
 }
@@ -64,9 +64,14 @@ void asteroid_draw(struct Asteroid *asteroid) {
 }
 
 void object_move(struct Object *obj) {
-	Vector2 new_velocity =
-		Vector2Scale(obj->velocity, obj->acceleration_factor);
-	obj->velocity = Vector2ClampValue(new_velocity, 0, obj->max_velocity);
+	// Y axis grows downwards, so we need to negate the y coordinate
+	Vector2 acceleration = {
+		.x = obj->thrust * (float)sin(obj->rotation * DEG2RAD),
+		.y = -obj->thrust * (float)cos(obj->rotation * DEG2RAD),
+	};
+	Vector2 velocity_change = Vector2Scale(acceleration, GetFrameTime());
+	obj->velocity = Vector2Add(obj->velocity, velocity_change);
+	obj->velocity = Vector2ClampValue(obj->velocity, 0.0f, obj->max_velocity);
 	obj->position = Vector2Add(obj->position, obj->velocity);
 }
 
@@ -98,4 +103,13 @@ void object_rotate(struct Object *obj, float delta) {
 		next += 360;
 	}
 	obj->rotation = next;
+}
+
+void object_thrust_inc(struct Object *obj, float delta) {
+	obj->thrust += delta;
+	if (obj->thrust > obj->max_thrust) {
+		obj->thrust = obj->max_thrust;
+	} else if (obj->thrust < 0) {
+		obj->thrust = 0;
+	}
 }

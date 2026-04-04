@@ -1,12 +1,12 @@
 #pragma once
 
 #include "raylib.h"
-#include <math.h>
 
 struct Object {
 	Vector2 position;
 	Vector2 velocity;
-	float acceleration_factor; // [0;1]
+	float thrust;
+	float max_thrust;
 	float max_velocity;
 	Color color;
 	float rotation;
@@ -38,6 +38,9 @@ Vector2 object_transform_vec(struct Object *obj, Vector2 vec);
 
 // rotate by delta (in deg)
 void object_rotate(struct Object *obj, float delta);
+
+// add delta to thrust, capping at max_thrust
+void object_thrust_inc(struct Object *obj, float delta);
 
 void asteroid_init(struct Asteroid *asteroid);
 
