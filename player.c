@@ -9,17 +9,15 @@ constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr float SHIP_HEIGHT = 27.47f;
 constexpr float SHIP_BASE = 20.0f;
 
-void player_init(struct Player *player) {
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+void player_init(struct Player *player, Vector2 screen_dimensions) {
 	*player = (struct Player){
 		.lives = PLAYER_STARTING_LIVES,
 		.object =
 			{
 				.position =
 					{
-						.x = (float)screenWidth / 2,
-						.y = (float)screenHeight / 2,
+						.x = (float)screen_dimensions.x / 2,
+						.y = (float)screen_dimensions.y / 2,
 					},
 				.max_velocity = 4.0f,
 				.thrust = 0,
@@ -54,6 +52,7 @@ void player_update(struct Player *player) {
 	if (input_key_down(ACTION_DOWN)) {
 		object_thrust_inc(&player->object, -thrust_inc);
 	}
+	// FIXME: this should be passed in to update
 	player_move(player, (Vector2){.x = 800, .y = 450});
 }
 

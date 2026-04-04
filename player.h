@@ -9,7 +9,7 @@ struct Player {
 	int lives;
 };
 
-void player_init(struct Player *player);
+void player_init(struct Player *player, Vector2 screen_dimensions);
 void player_update(struct Player *player);
 void player_draw(struct Player *player);
 void player_move(struct Player *player, Vector2 screen_dimensions);

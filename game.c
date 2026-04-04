@@ -18,7 +18,7 @@ void game_init(struct Game *game, int screenWidth, int screenHeight) {
 				.y = (float)screenHeight,
 			},
 	};
-	player_init(&game->player);
+	player_init(&game->player, game->screen_dimensions);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
 		struct Asteroid *asteroid = malloc(sizeof(*asteroid));
