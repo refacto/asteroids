@@ -19,11 +19,6 @@ struct Asteroid {
 	struct Asteroid *next;
 };
 
-struct Shot {
-	struct Object object;
-	bool active;
-};
-
 // moves an object, adjusting its speed based on acceleration
 void object_move(struct Object *obj);
 
