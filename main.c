@@ -1,3 +1,4 @@
+#include "fontLoader.h"
 #include "game.h"
 #include "screenController.h"
 
@@ -11,6 +12,8 @@ int main(void) {
 	InitWindow(screenWidth, screenHeight, "Asteroids");
 	SetTargetFPS(60);
 
+	struct FontLoader *fontLoader = &(struct FontLoader){};
+	fontLoader_init(fontLoader);
 	struct Game *game = &(struct Game){};
 	game_init(game, screenWidth, screenHeight);
 
@@ -32,6 +35,7 @@ int main(void) {
 	}
 
 	game_destroy(game);
+	fontLoader_destroy(fontLoader);
 	CloseWindow();
 	return EXIT_SUCCESS;
 }
