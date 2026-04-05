@@ -1,5 +1,6 @@
 #include "fontLoader.h"
 #include "game.h"
+#include "globalActions.h"
 #include "screenController.h"
 
 #include "raylib.h"
@@ -26,7 +27,7 @@ int main(void) {
 					});
 	screen_set_active(screenController, SCREEN_GAME);
 
-	while (!WindowShouldClose()) {
+	while ((!WindowShouldClose()) && !quit_isRequested()) {
 		screen_update(screenController);
 
 		BeginDrawing();
