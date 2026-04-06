@@ -25,8 +25,8 @@ void asteroid_init(struct Asteroid *asteroid) {
 				.thrust = 0,
 			},
 	};
-	// generate vertex offsets: most sit on the circle (1.0),
-	// some are shifted inward for a jagged asteroid shape
+	// generate vertex offsets: half sit on the circle (1.0),
+	// the other half are shifted inward for a jagged asteroid shape
 	for (int i = 0; i < ASTEROID_NUM_VERTICES; i++) {
 		if (GetRandomValue(0, 1)) {
 			asteroid->vertex_offsets[i] = 1.0f;
