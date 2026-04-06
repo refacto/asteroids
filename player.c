@@ -118,7 +118,7 @@ void player_draw(struct Player *player) {
 	DrawTriangleLines(head, left, right, player->object.color);
 #ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
-			   3, BLUE);
+			   3, YELLOW);
 #endif
 	draw_shots(player);
 
