@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 static void valid_type_or_die(enum ScreenType type) {
-	if (type >= _SCREEN_MAX) {
+	if (type >= _SCREEN_MAX || type < 0) {
 		fprintf(stderr, "invalid screen type %d\n", type);
 		abort();
 	}
