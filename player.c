@@ -25,6 +25,7 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 				.max_velocity = 4.0f,
 				.thrust = 0,
 				.max_thrust = 4,
+				.color = WHITE,
 			},
 	};
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
@@ -39,7 +40,7 @@ static void render_debug(struct Player *player) {
 	float speed = Vector2Length(player->object.velocity);
 	snprintf(buf, sizeof(buf), "thrust=%f\nspeed=%f", player->object.thrust,
 			 speed);
-	DrawText(buf, 0, 0, 12, BLACK);
+	DrawText(buf, 0, 0, 12, WHITE);
 };
 #endif
 
@@ -114,7 +115,7 @@ void player_draw(struct Player *player) {
 		&player->object, (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
 	Vector2 right = object_transform_vec(
 		&player->object, (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
-	DrawTriangleLines(head, left, right, DARKBLUE);
+	DrawTriangleLines(head, left, right, player->object.color);
 #ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, BLUE);

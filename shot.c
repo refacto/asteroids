@@ -11,7 +11,7 @@ void shot_init(struct Shot *shot) {
 	*shot = (struct Shot){
 		.object =
 			{
-				.color = BLACK,
+				.color = WHITE,
 				.max_velocity = SHOT_SPEED,
 			},
 		.lifetime = STARTING_LIFETIME,
