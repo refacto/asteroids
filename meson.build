@@ -35,6 +35,15 @@ if get_option('buildtype') == 'release'
   )
 endif
 
+if get_option('debug-ship')
+  add_project_arguments(
+    [
+      '-DDEBUG_SHIP',
+    ],
+    language: 'c',
+  )
+endif
+
 # Link: https://best.openssf.org/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++
 # Link: https://github.com/intel/igsc/blob/master/meson.build
 add_project_arguments(

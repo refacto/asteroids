@@ -4,7 +4,9 @@
 #include "raylib.h"
 #include "shot.h"
 #include <raymath.h>
+#ifdef DEBUG_SHIP
 #include <stdio.h>
+#endif
 
 constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr float SHIP_HEIGHT = 27.47f;
@@ -30,6 +32,7 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 	}
 }
 
+#ifdef DEBUG_SHIP
 static void render_debug(struct Player *player) {
 	// debug stuff
 	char buf[BUFSIZ];
@@ -38,6 +41,7 @@ static void render_debug(struct Player *player) {
 			 speed);
 	DrawText(buf, 0, 0, 12, BLACK);
 };
+#endif
 
 static Vector2 shiphead_position(struct Player *player) {
 	return object_transform_vec(&player->object,
@@ -110,13 +114,16 @@ void player_draw(struct Player *player) {
 		&player->object, (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
 	Vector2 right = object_transform_vec(
 		&player->object, (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
-	DrawTriangleLines(head, left, right, WHITE);
+	DrawTriangleLines(head, left, right, DARKBLUE);
+#ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, BLUE);
+#endif
 	draw_shots(player);
 
-	// TODO: remove / gate behind flag
+#ifdef DEBUG_SHIP
 	render_debug(player);
+#endif
 }
 
 void player_move(struct Player *player, Vector2 screen_dimensions) {

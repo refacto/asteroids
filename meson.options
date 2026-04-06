@@ -1,0 +1,6 @@
+option(
+  'debug-ship',
+  type: 'boolean',
+  value: false,
+  description: 'Show ship debug information',
+)
