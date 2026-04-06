@@ -29,12 +29,11 @@ void screen_transition(struct ScreenController *controller,
 
 void screen_update(struct ScreenController *controller) {
 	controller->active->update(controller, controller->active->data);
-	while (controller->transition) {
-		// we need to initialize the new component, which theoretically could
-		// transition yet again, so we play that dance until they stop
+	if (controller->transition) {
 		controller->active = controller->transition;
 		controller->transition = nullptr;
-		controller->active->update(controller, controller->active->data);
+		// we don't update here, so that we have a frame of delay
+		// if we don't do that, we'll double interpret input on the new screen
 	}
 }
 
