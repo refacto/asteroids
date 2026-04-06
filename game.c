@@ -1,4 +1,5 @@
 #include "game.h"
+#include "player.h"
 #include <raylib.h>
 #include <stdlib.h>
 
@@ -19,7 +20,7 @@ void game_init(struct Game *game, int screenWidth, int screenHeight) {
 				.y = (float)screenHeight,
 			},
 	};
-	player_init(&game->player);
+	player_init(&game->player, game->screen_dimensions);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
 		struct Asteroid *asteroid = malloc(sizeof(*asteroid));
@@ -47,6 +48,7 @@ void game_update(struct Game *game) {
 		asteroid_move(cur, game->screen_dimensions);
 		cur = cur->next;
 	}
+	player_update(&game->player);
 }
 
 void game_draw(struct Game *game) {
@@ -56,6 +58,7 @@ void game_draw(struct Game *game) {
 		asteroid_draw(cur);
 		cur = cur->next;
 	}
+	player_draw(&game->player);
 }
 
 void game_screen_update(unused struct ScreenController *ctrl, void *data) {

@@ -5,7 +5,8 @@
 struct Object {
 	Vector2 position;
 	Vector2 velocity;
-	float acceleration_factor; // [0;1]
+	float thrust;
+	float max_thrust;
 	float max_velocity;
 	Color color;
 	float rotation;
@@ -23,14 +24,6 @@ struct Shot {
 	bool active;
 };
 
-constexpr int MAX_NUM_SHOTS = 5;
-
-struct Player {
-	struct Object object;
-	struct Shot shots[MAX_NUM_SHOTS];
-	int lives;
-};
-
 // moves an object, adjusting its speed based on acceleration
 void object_move(struct Object *obj);
 
@@ -38,6 +31,16 @@ void object_move(struct Object *obj);
 // wrap_offset describes the padding that's added to avoid jumping
 void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
 						float wrap_offset);
+
+// transform a given vector into the global coordinate system
+// applying rotation and position offset
+Vector2 object_transform_vec(struct Object *obj, Vector2 vec);
+
+// rotate by delta (in deg)
+void object_rotate(struct Object *obj, float delta);
+
+// add delta to thrust, capping at max_thrust
+void object_thrust_inc(struct Object *obj, float delta);
 
 void asteroid_init(struct Asteroid *asteroid);
 
@@ -56,5 +59,3 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 void asteroid_draw(struct Asteroid *asteroid);
 
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
-
-void player_init(struct Player *player);

@@ -64,6 +64,7 @@ srcs = [
   'main.c',
   'game.c',
   'input.c',
+  'player.c',
   'screenController.c',
   'objects.c',
 ]
