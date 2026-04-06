@@ -2,6 +2,7 @@
 #include "input.h"
 #include "objects.h"
 #include "raylib.h"
+#include "shot.h"
 #include <raymath.h>
 #include <stdio.h>
 
@@ -24,6 +25,9 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 				.max_thrust = 4,
 			},
 	};
+	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
+		shot_init(&player->shots[i]);
+	}
 }
 
 static void render_debug(struct Player *player) {
@@ -35,7 +39,31 @@ static void render_debug(struct Player *player) {
 	DrawText(buf, 0, 0, 12, BLACK);
 };
 
-void player_update(struct Player *player) {
+static Vector2 shiphead_position(struct Player *player) {
+	return object_transform_vec(&player->object,
+								(Vector2){.y = -SHIP_HEIGHT / 2});
+}
+
+static struct Shot *get_inactive_shot(struct Player *player) {
+	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
+		struct Shot *cur = &player->shots[i];
+		if (!cur->active) {
+			return cur;
+		}
+	}
+	return nullptr;
+}
+
+static void try_fire_shot(struct Player *player) {
+	struct Shot *shot = get_inactive_shot(player);
+	if (!shot) {
+		return; // exceeded the maximum amount of bullets
+	}
+	Vector2 startpos = shiphead_position(player);
+	shot_fire(shot, startpos, player->object.rotation);
+}
+
+static void handle_input(struct Player *player) {
 	constexpr float rotation_increment = 5;
 	if (input_key_down(ACTION_LEFT)) {
 		object_rotate(&player->object, -rotation_increment);
@@ -52,13 +80,32 @@ void player_update(struct Player *player) {
 	if (input_key_down(ACTION_DOWN)) {
 		object_thrust_inc(&player->object, -thrust_inc);
 	}
+	if (input_key_once(ACTION_EXECUTE)) {
+		try_fire_shot(player);
+	}
+}
+
+static void update_shots(struct Player *player) {
+	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
+		shot_update(&player->shots[i]);
+	}
+}
+
+void player_update(struct Player *player) {
+	handle_input(player);
+	update_shots(player);
 	// FIXME: this should be passed in to update
 	player_move(player, (Vector2){.x = 800, .y = 450});
 }
 
+static void draw_shots(struct Player *player) {
+	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
+		shot_draw(&player->shots[i]);
+	}
+}
+
 void player_draw(struct Player *player) {
-	Vector2 head =
-		object_transform_vec(&player->object, (Vector2){.y = -SHIP_HEIGHT / 2});
+	Vector2 head = shiphead_position(player);
 	Vector2 left = object_transform_vec(
 		&player->object, (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
 	Vector2 right = object_transform_vec(
@@ -66,6 +113,7 @@ void player_draw(struct Player *player) {
 	DrawTriangleLines(head, left, right, DARKBLUE);
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, BLUE);
+	draw_shots(player);
 
 	// TODO: remove / gate behind flag
 	render_debug(player);

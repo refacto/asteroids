@@ -1,5 +1,6 @@
 #pragma once
 #include "objects.h"
+#include "shot.h"
 
 constexpr int MAX_NUM_SHOTS = 5;
 
