@@ -74,6 +74,7 @@ srcs = [
   'game.c',
   'input.c',
   'player.c',
+  'asteroid.c',
   'screenController.c',
   'shot.c',
   'fontLoader.c',

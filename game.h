@@ -1,6 +1,6 @@
 #pragma once
+#include "asteroid.h"
 #include "player.h"
-#include "objects.h"
 #include "screenController.h"
 #include <raylib.h>
 
