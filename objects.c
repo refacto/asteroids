@@ -25,6 +25,16 @@ void asteroid_init(struct Asteroid *asteroid) {
 				.thrust = 0,
 			},
 	};
+	// generate vertex offsets: half sit on the circle (1.0),
+	// the other half are shifted inward for a jagged asteroid shape
+	for (int i = 0; i < ASTEROID_NUM_VERTICES; i++) {
+		if (GetRandomValue(0, 1)) {
+			asteroid->vertex_offsets[i] = 1.0f;
+		} else {
+			asteroid->vertex_offsets[i] =
+				0.5f + (float)GetRandomValue(0, 50) / 100.0f;
+		}
+	}
 }
 
 bool asteroid_has_next(const struct Asteroid *asteroid) {
@@ -59,8 +69,21 @@ void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
 }
 
 void asteroid_draw(struct Asteroid *asteroid) {
-	DrawCircle((int)asteroid->object.position.x,
-			   (int)asteroid->object.position.y, asteroid->radius, VIOLET);
+	float cx = asteroid->object.position.x;
+	float cy = asteroid->object.position.y;
+	float r = asteroid->radius;
+	float angle_step = 360.0f / ASTEROID_NUM_VERTICES;
+
+	for (int i = 0; i < ASTEROID_NUM_VERTICES; i++) {
+		int next = (i + 1) % ASTEROID_NUM_VERTICES;
+		float angle1 = (float)i * angle_step * DEG2RAD;
+		float angle2 = (float)next * angle_step * DEG2RAD;
+		float r1 = r * asteroid->vertex_offsets[i];
+		float r2 = r * asteroid->vertex_offsets[next];
+		DrawLine((int)(cx + cosf(angle1) * r1), (int)(cy + sinf(angle1) * r1),
+				 (int)(cx + cosf(angle2) * r2), (int)(cy + sinf(angle2) * r2),
+				 WHITE);
+	}
 }
 
 void object_move(struct Object *obj) {

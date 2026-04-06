@@ -110,7 +110,7 @@ void player_draw(struct Player *player) {
 		&player->object, (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
 	Vector2 right = object_transform_vec(
 		&player->object, (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
-	DrawTriangleLines(head, left, right, DARKBLUE);
+	DrawTriangleLines(head, left, right, WHITE);
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, BLUE);
 	draw_shots(player);

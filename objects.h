@@ -12,9 +12,13 @@ struct Object {
 	float rotation;
 };
 
+constexpr int ASTEROID_NUM_VERTICES = 10;
+
 struct Asteroid {
 	struct Object object;
 	float radius;
+	// vertex offsets as fraction of radius [0.5 - 1.0], giving jagged shape
+	float vertex_offsets[ASTEROID_NUM_VERTICES];
 	// intrusive linked list
 	struct Asteroid *next;
 };
