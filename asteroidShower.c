@@ -11,7 +11,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 	int deg =
 		GetRandomValue(ASTEROID_SHOWER_DIR_CENTER - ASTEROID_SHOWER_DIR_SPREAD,
 					   ASTEROID_SHOWER_DIR_CENTER + ASTEROID_SHOWER_DIR_SPREAD);
-	float speed = (float)GetRandomValue(1, 3);
+	float speed = (float)GetRandomValue(1, 2);
 	Vector2 velocity = {
 		.x = speed * cosf((float)deg * DEG2RAD),
 		.y = speed * sinf((float)deg * DEG2RAD),
