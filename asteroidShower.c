@@ -26,6 +26,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 				.x = (float)GetRandomValue(0, (int)screenDimensions.x),
 				.y = (float)GetRandomValue(0, (int)screenDimensions.y),
 			};
+			// TODO: we should use the future general collision logic here
 			overlaps = false;
 			for (int j = 0; j < i; j++) {
 				if (CheckCollisionCircles(pos, as->asteroids[i].radius,
