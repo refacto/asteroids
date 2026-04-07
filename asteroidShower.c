@@ -18,7 +18,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 	};
 	for (int i = 0; i < ASTEROID_SHOWER_COUNT; i++) {
 		asteroid_init(&as->asteroids[i]);
-		as->asteroids[i].object.velocity = velocity;
+		asteroid_set_velocity(&as->asteroids[i], velocity);
 		Vector2 pos;
 		bool overlaps;
 		do {
@@ -37,7 +37,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 				}
 			}
 		} while (overlaps);
-		as->asteroids[i].object.position = pos;
+		asteroid_set_position(&as->asteroids[i], pos);
 	}
 }
 
