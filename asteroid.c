@@ -62,6 +62,14 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next) {
 	asteroid->next = next;
 }
 
+void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity) {
+	asteroid->object.velocity = velocity;
+}
+
+void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
+	asteroid->object.position = position;
+}
+
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
 	object_move(&asteroid->object);
 	object_wrap_screen(&asteroid->object, screen_dimensions, asteroid->radius);
