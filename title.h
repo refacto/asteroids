@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fontLoader.h"
+#include "meteorShower.h"
 #include "screenController.h"
 #include <raylib.h>
 
@@ -8,6 +9,7 @@ struct Title {
 	bool isGameOver;
 	Vector2 screenDimensions;
 	struct FontLoader *fontLoader;
+	struct MeteorShower meteorShower;
 };
 
 void title_init(struct Title *title, struct FontLoader *fontLoader,

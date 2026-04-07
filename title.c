@@ -57,6 +57,7 @@ void title_init(struct Title *title, struct FontLoader *fontLoader,
 				.y = (float)screenHeight,
 			},
 	};
+	meteorShower_init(&title->meteorShower, title->screenDimensions);
 }
 
 void title_destroy(unused struct Title *title) {}
@@ -71,6 +72,7 @@ static void inc_selected(int delta) {
 }
 
 void title_update(unused struct Title *title, struct ScreenController *ctrl) {
+	meteorShower_update(&title->meteorShower);
 	if (input_key_once(ACTION_DOWN)) {
 		inc_selected(1);
 	}
@@ -103,6 +105,7 @@ static float drawTextCentered(struct Title *title, enum FontType type,
 
 void title_draw(unused struct Title *title) {
 	ClearBackground(BLACK);
+	meteorShower_draw(&title->meteorShower);
 	char const *titleText = "ASTEROIDS";
 	float y = 20; // padding
 	y = drawTextCentered(title, FONT_TITLE, titleText,
