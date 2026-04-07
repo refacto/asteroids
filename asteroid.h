@@ -29,3 +29,7 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 void asteroid_draw(struct Asteroid *asteroid);
 
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
+
+void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity);
+
+void asteroid_set_position(struct Asteroid *asteroid, Vector2 position);

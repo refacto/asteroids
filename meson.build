@@ -80,6 +80,7 @@ srcs = [
   'fontLoader.c',
   'objects.c',
   'title.c',
+  'asteroidShower.c',
   'globalActions.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])
