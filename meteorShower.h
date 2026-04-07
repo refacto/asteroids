@@ -8,6 +8,7 @@
 struct MeteorShower {
 	struct Asteroid meteors[METEOR_SHOWER_COUNT];
 	Vector2 screenDimensions;
+	Vector2 velocity;
 };
 
 void meteorShower_init(struct MeteorShower *ms, Vector2 screenDimensions);

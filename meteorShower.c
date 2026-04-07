@@ -1,6 +1,7 @@
 #include "meteorShower.h"
 #include <math.h>
 #include <raylib.h>
+#include <raymath.h>
 
 // direction: toward bottom-left in screen coords (Y-down)
 constexpr int METEOR_DIR_CENTER = 135;
@@ -32,21 +33,42 @@ static Vector2 meteor_spawn_position(Vector2 screen) {
 	}
 }
 
-static void meteor_init_one(struct Asteroid *m, Vector2 screen) {
+static bool collides_with_any(struct MeteorShower *ms, int skip, Vector2 pos,
+							  float radius) {
+	for (int j = 0; j < METEOR_SHOWER_COUNT; j++) {
+		if (j == skip) {
+			continue;
+		}
+		float min_dist = radius + ms->meteors[j].radius;
+		if (Vector2Distance(pos, ms->meteors[j].object.position) < min_dist) {
+			return true;
+		}
+	}
+	return false;
+}
+
+static void meteor_spawn(struct Asteroid *m, struct MeteorShower *ms, int idx,
+						 Vector2 pos) {
 	asteroid_init(m);
-	m->object.position = meteor_spawn_position(screen);
-	m->object.velocity = meteor_velocity();
+	m->object.velocity = ms->velocity;
+	for (int attempt = 0; attempt < 50; attempt++) {
+		if (!collides_with_any(ms, idx, pos, m->radius)) {
+			break;
+		}
+		pos = meteor_spawn_position(ms->screenDimensions);
+	}
+	m->object.position = pos;
 }
 
 void meteorShower_init(struct MeteorShower *ms, Vector2 screenDimensions) {
 	ms->screenDimensions = screenDimensions;
+	ms->velocity = meteor_velocity();
 	for (int i = 0; i < METEOR_SHOWER_COUNT; i++) {
-		meteor_init_one(&ms->meteors[i], screenDimensions);
-		// Spread initial positions across the screen instead of all at edges
-		ms->meteors[i].object.position = (Vector2){
+		Vector2 pos = {
 			.x = (float)GetRandomValue(0, (int)screenDimensions.x),
 			.y = (float)GetRandomValue(0, (int)screenDimensions.y),
 		};
+		meteor_spawn(&ms->meteors[i], ms, i, pos);
 	}
 }
 
@@ -60,7 +82,8 @@ void meteorShower_update(struct MeteorShower *ms) {
 		struct Asteroid *m = &ms->meteors[i];
 		object_move(&m->object);
 		if (meteor_is_offscreen(m, ms->screenDimensions)) {
-			meteor_init_one(m, ms->screenDimensions);
+			meteor_spawn(m, ms, METEOR_SHOWER_COUNT,
+						 meteor_spawn_position(ms->screenDimensions));
 		}
 	}
 }
