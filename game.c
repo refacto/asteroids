@@ -33,6 +33,7 @@ void game_init(struct Game *game, int screenWidth, int screenHeight) {
 }
 
 void game_destroy(struct Game *game) {
+	player_destroy(&game->player);
 	struct Asteroid *last;
 	struct Asteroid *cur = game->asteroids;
 	while (cur) {

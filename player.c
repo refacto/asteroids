@@ -8,6 +8,8 @@
 #include <stdio.h>
 #endif
 
+#include "resources/audio/shoot.h"
+
 constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr float SHIP_HEIGHT = 27.47f;
 constexpr float SHIP_BASE = 20.0f;
@@ -31,6 +33,18 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		shot_init(&player->shots[i]);
 	}
+	Wave wave = {
+		.frameCount = SHOOT_FRAME_COUNT,
+		.sampleRate = SHOOT_SAMPLE_RATE,
+		.sampleSize = SHOOT_SAMPLE_SIZE,
+		.channels = SHOOT_CHANNELS,
+		.data = SHOOT_DATA,
+	};
+	player->shoot_sound = LoadSoundFromWave(wave);
+}
+
+void player_destroy(struct Player *player) {
+	UnloadSound(player->shoot_sound);
 }
 
 #ifdef DEBUG_SHIP
@@ -66,6 +80,7 @@ static void try_fire_shot(struct Player *player) {
 	}
 	Vector2 startpos = shiphead_position(player);
 	shot_fire(shot, startpos, player->object.rotation);
+	PlaySound(player->shoot_sound);
 }
 
 static void handle_input(struct Player *player) {
