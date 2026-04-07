@@ -47,8 +47,8 @@ void shot_fire(struct Shot *shot, Vector2 position, float rotation) {
 	shot->object.position = position;
 	shot->object.rotation = rotation;
 	shot->object.velocity = (Vector2){
-		.x = (float)(SHOT_SPEED * sin((float)rotation * DEG2RAD)),
-		.y = (float)(-SHOT_SPEED * cos((float)rotation * DEG2RAD)),
+		.x = SHOT_SPEED * sinf(rotation * DEG2RAD),
+		.y = -SHOT_SPEED * cosf(rotation * DEG2RAD),
 	};
 	shot->active = true;
 	shot->lifetime = STARTING_LIFETIME;

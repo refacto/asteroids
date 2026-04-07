@@ -1,11 +1,12 @@
 #include "objects.h"
 #include "raymath.h"
 #include <raylib.h>
+
 void object_move(struct Object *obj) {
 	// Y axis grows downwards, so we need to negate the y coordinate
 	Vector2 acceleration = {
-		.x = obj->thrust * (float)sin(obj->rotation * DEG2RAD),
-		.y = -obj->thrust * (float)cos(obj->rotation * DEG2RAD),
+		.x = obj->thrust * sinf(obj->rotation * DEG2RAD),
+		.y = -obj->thrust * cosf(obj->rotation * DEG2RAD),
 	};
 	Vector2 velocity_change = Vector2Scale(acceleration, GetFrameTime());
 	obj->velocity = Vector2Add(obj->velocity, velocity_change);
