@@ -1,5 +1,5 @@
 #include "input.h"
-#include "raylib.h"
+#include <raylib.h>
 
 static bool input_key_f(enum KeyAction action, bool (*f)(int)) {
 	switch (action) {

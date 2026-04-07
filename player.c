@@ -1,8 +1,8 @@
 #include "player.h"
 #include "input.h"
 #include "objects.h"
-#include "raylib.h"
 #include "shot.h"
+#include <raylib.h>
 #include <raymath.h>
 #ifdef DEBUG_SHIP
 #include <stdio.h>

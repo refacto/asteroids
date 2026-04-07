@@ -2,8 +2,8 @@
 #include "fontLoader.h"
 #include "globalActions.h"
 #include "input.h"
-#include "raylib.h"
 #include "screenController.h"
+#include <raylib.h>
 #include <stddef.h>
 
 #define unused [[maybe_unused]]

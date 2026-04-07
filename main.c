@@ -4,7 +4,7 @@
 #include "screenController.h"
 #include "title.h"
 
-#include "raylib.h"
+#include <raylib.h>
 #include <stdlib.h>
 
 int main(void) {
