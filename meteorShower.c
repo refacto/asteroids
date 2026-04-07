@@ -1,5 +1,4 @@
 #include "meteorShower.h"
-#include <math.h>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -7,16 +6,6 @@
 constexpr int METEOR_DIR_CENTER = 135;
 // spread: +-15
 constexpr int METEOR_DIR_SPREAD = 15;
-
-static Vector2 meteor_velocity(void) {
-	int deg = GetRandomValue(METEOR_DIR_CENTER - METEOR_DIR_SPREAD,
-							 METEOR_DIR_CENTER + METEOR_DIR_SPREAD);
-	float speed = (float)GetRandomValue(1, 3);
-	return (Vector2){
-		.x = speed * cosf((float)deg * DEG2RAD),
-		.y = speed * sinf((float)deg * DEG2RAD),
-	};
-}
 
 // spawn at a random position along the top or right edge
 static Vector2 meteor_spawn_position(Vector2 screen) {
@@ -62,7 +51,13 @@ static void meteor_spawn(struct Asteroid *m, struct MeteorShower *ms, int idx,
 
 void meteorShower_init(struct MeteorShower *ms, Vector2 screenDimensions) {
 	ms->screenDimensions = screenDimensions;
-	ms->velocity = meteor_velocity();
+	int deg = GetRandomValue(METEOR_DIR_CENTER - METEOR_DIR_SPREAD,
+							 METEOR_DIR_CENTER + METEOR_DIR_SPREAD);
+	float speed = (float)GetRandomValue(1, 3);
+	ms->velocity = (Vector2){
+		.x = speed * cosf((float)deg * DEG2RAD),
+		.y = speed * sinf((float)deg * DEG2RAD),
+	};
 	for (int i = 0; i < METEOR_SHOWER_COUNT; i++) {
 		Vector2 pos = {
 			.x = (float)GetRandomValue(0, (int)screenDimensions.x),
