@@ -2,6 +2,7 @@
 #include "objects.h"
 #include <math.h>
 #include <raylib.h>
+#include <raymath.h>
 #include <stdio.h>
 
 constexpr float ASTEROID_LARGE_RADIUS = 40.0f;
@@ -114,4 +115,24 @@ void asteroid_draw(struct Asteroid *asteroid) {
 		DrawLine((int)thisPoint.x, (int)thisPoint.y, (int)nextPoint.x,
 				 (int)nextPoint.y, WHITE);
 	}
+}
+
+bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
+							 float radius) {
+	// if we aren't even in the mesh, we can't possibly collide
+	if (!CheckCollisionCircles(asteroid->object.position, asteroid->radius,
+							   position, radius)) {
+		return false;
+	}
+	// this is fairly expensive
+	// we punt the radius, using the center will presumably work just fine
+	// TODO: figure out closest point if that assumption doesn't pan out
+	return CheckCollisionPointPoly(position, asteroid->transformedPoints,
+								   ASTEROID_NUM_POINTS);
+}
+
+// TODO: remove, just here for demo
+void asteroid_stop_moving(struct Asteroid *asteroid) {
+	asteroid->object.velocity = Vector2Zero();
+	asteroid->object.thrust = 0;
 }

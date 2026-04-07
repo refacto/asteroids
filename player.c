@@ -1,4 +1,5 @@
 #include "player.h"
+#include "asteroid.h"
 #include "input.h"
 #include "objects.h"
 #include "raylib.h"
@@ -130,4 +131,20 @@ void player_draw(struct Player *player) {
 void player_move(struct Player *player, Vector2 screen_dimensions) {
 	object_move(&player->object);
 	object_wrap_screen(&player->object, screen_dimensions, SHIP_HEIGHT);
+}
+
+enum CollisionResult player_check_collision(struct Player *player,
+											struct Asteroid *asteroid) {
+	enum CollisionResult ret = NO_HIT;
+	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
+		struct Shot *shot = &player->shots[i];
+		if (!shot->active) {
+			continue;
+		}
+		if (shot_collide_asteroid(shot, asteroid)) {
+			shot_stop_moving(shot);
+			return DESTROYED;
+		};
+	}
+	return ret;
 }

@@ -35,3 +35,9 @@ void asteroid_update(struct Asteroid *asteroid, Vector2 screen_dimensions);
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity);
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position);
+
+bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
+							 float radius);
+
+// TODO: remove, just here for demo
+void asteroid_stop_moving(struct Asteroid *asteroid);

@@ -1,4 +1,5 @@
 #pragma once
+#include "asteroid.h"
 #include "objects.h"
 #include "shot.h"
 
@@ -10,7 +11,15 @@ struct Player {
 	int lives;
 };
 
+enum CollisionResult {
+	NO_HIT,
+	DESTROYED,
+	PLAYER_DAMAGE,
+};
+
 void player_init(struct Player *player, Vector2 screen_dimensions);
 void player_update(struct Player *player);
 void player_draw(struct Player *player);
 void player_move(struct Player *player, Vector2 screen_dimensions);
+enum CollisionResult player_check_collision(struct Player *player,
+											struct Asteroid *asteroid);
