@@ -1,13 +1,12 @@
 #pragma once
 #include "objects.h"
 
-constexpr int ASTEROID_NUM_VERTICES = 10;
+constexpr int ASTEROID_NUM_POINTS = 10;
 
 struct Asteroid {
 	struct Object object;
 	float radius;
-	// vertex offsets as fraction of radius [0.5 - 1.0], giving jagged shape
-	float vertex_offsets[ASTEROID_NUM_VERTICES];
+	Vector2 points[ASTEROID_NUM_POINTS];
 	// intrusive linked list
 	struct Asteroid *next;
 };
