@@ -92,22 +92,25 @@ void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
 
 // moves the origin centered shape points to the logical location on screen,
 // accounting for the object rotation
-static void transformPoints(struct Asteroid *asteroid,
-							Vector2 out[ASTEROID_NUM_POINTS]) {
+static void transform_points(struct Asteroid *asteroid) {
 	for (int i = 0; i < ASTEROID_NUM_POINTS; i++) {
-		out[i] = object_transform_vec(&asteroid->object, asteroid->points[i]);
+		asteroid->transformedPoints[i] =
+			object_transform_vec(&asteroid->object, asteroid->points[i]);
 	}
 }
 
+void asteroid_update(struct Asteroid *asteroid, Vector2 screen_dimensions) {
+	asteroid_move(asteroid, screen_dimensions);
+	// cache the transformed points, both drawing and collision need it
+	transform_points(asteroid);
+}
+
 void asteroid_draw(struct Asteroid *asteroid) {
-	// we need to draw around the shape center, so move all points there first
-	Vector2 shiftedPoints[ASTEROID_NUM_POINTS];
-	transformPoints(asteroid, shiftedPoints);
-	// Now connect all consecutive points with lines, this yields a jagged shape
+	// connect all consecutive points with lines, this yields a jagged shape
 	for (int idx = 0; idx < ASTEROID_NUM_POINTS; idx++) {
 		int nextIdx = (idx + 1) % ASTEROID_NUM_POINTS;
-		Vector2 thisPoint = shiftedPoints[idx];
-		Vector2 nextPoint = shiftedPoints[nextIdx];
+		Vector2 thisPoint = asteroid->transformedPoints[idx];
+		Vector2 nextPoint = asteroid->transformedPoints[nextIdx];
 		DrawLine((int)thisPoint.x, (int)thisPoint.y, (int)nextPoint.x,
 				 (int)nextPoint.y, WHITE);
 	}

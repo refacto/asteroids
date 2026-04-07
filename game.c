@@ -43,10 +43,10 @@ void game_destroy(struct Game *game) {
 }
 
 void game_update(struct Game *game) {
-	struct Asteroid *cur = game->asteroids;
-	while (cur) {
-		asteroid_move(cur, game->screen_dimensions);
-		cur = cur->next;
+	struct Asteroid *asteroid = game->asteroids;
+	while (asteroid) {
+		asteroid_update(asteroid, game->screen_dimensions);
+		asteroid = asteroid->next;
 	}
 	player_update(&game->player);
 }

@@ -6,7 +6,10 @@ constexpr int ASTEROID_NUM_POINTS = 10;
 struct Asteroid {
 	struct Object object;
 	float radius;
+	// raw shape points, centered at the origin
 	Vector2 points[ASTEROID_NUM_POINTS];
+	// logical shape points, rotated and centered around the position
+	Vector2 transformedPoints[ASTEROID_NUM_POINTS];
 	// intrusive linked list
 	struct Asteroid *next;
 };
@@ -27,7 +30,7 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 // draws the asteroid
 void asteroid_draw(struct Asteroid *asteroid);
 
-void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
+void asteroid_update(struct Asteroid *asteroid, Vector2 screen_dimensions);
 
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity);
 

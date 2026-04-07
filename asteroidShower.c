@@ -43,7 +43,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 
 void asteroidShower_update(struct AsteroidShower *as) {
 	for (int i = 0; i < ASTEROID_SHOWER_COUNT; i++) {
-		asteroid_move(&as->asteroids[i], as->screenDimensions);
+		asteroid_update(&as->asteroids[i], as->screenDimensions);
 	}
 }
 
