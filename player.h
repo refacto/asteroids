@@ -4,10 +4,15 @@
 #include "shot.h"
 
 constexpr int MAX_NUM_SHOTS = 5;
+constexpr int PLAYER_NUM_POINTS = 3;
 
 struct Player {
 	struct Object object;
 	struct Shot shots[MAX_NUM_SHOTS];
+	// raw shape points, centered at the origin
+	Vector2 points[PLAYER_NUM_POINTS];
+	// logical shape points, rotated and centered around the position
+	Vector2 transformedPoints[PLAYER_NUM_POINTS];
 	int lives;
 };
 

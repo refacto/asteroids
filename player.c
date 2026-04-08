@@ -13,6 +13,12 @@ constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr float SHIP_HEIGHT = 27.47f;
 constexpr float SHIP_BASE = 20.0f;
 
+static void fill_points(Vector2 points[PLAYER_NUM_POINTS]) {
+	points[0] = (Vector2){.y = -SHIP_HEIGHT / 2}; // ship head
+	points[1] = (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2}; // left
+	points[2] = (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2};  // right
+}
+
 void player_init(struct Player *player, Vector2 screen_dimensions) {
 	*player = (struct Player){
 		.lives = PLAYER_STARTING_LIVES,
@@ -32,6 +38,7 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		shot_init(&player->shots[i]);
 	}
+	fill_points(player->points);
 }
 
 #ifdef DEBUG_SHIP
@@ -46,8 +53,7 @@ static void render_debug(struct Player *player) {
 #endif
 
 static Vector2 shiphead_position(struct Player *player) {
-	return object_transform_vec(&player->object,
-								(Vector2){.y = -SHIP_HEIGHT / 2});
+	return player->transformedPoints[0];
 }
 
 static struct Shot *get_inactive_shot(struct Player *player) {
@@ -91,6 +97,15 @@ static void handle_input(struct Player *player) {
 	}
 }
 
+// moves the origin centered shape points to the logical location on screen,
+// accounting for the object rotation
+static void transform_points(struct Player *player) {
+	for (int i = 0; i < PLAYER_NUM_POINTS; i++) {
+		player->transformedPoints[i] =
+			object_transform_vec(&player->object, player->points[i]);
+	}
+}
+
 static void update_shots(struct Player *player) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		shot_update(&player->shots[i]);
@@ -102,6 +117,7 @@ void player_update(struct Player *player) {
 	update_shots(player);
 	// FIXME: this should be passed in to update
 	player_move(player, (Vector2){.x = 800, .y = 450});
+	transform_points(player);
 }
 
 static void draw_shots(struct Player *player) {
@@ -111,12 +127,8 @@ static void draw_shots(struct Player *player) {
 }
 
 void player_draw(struct Player *player) {
-	Vector2 head = shiphead_position(player);
-	Vector2 left = object_transform_vec(
-		&player->object, (Vector2){.x = -SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
-	Vector2 right = object_transform_vec(
-		&player->object, (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2});
-	DrawTriangleLines(head, left, right, player->object.color);
+	Vector2 *points = player->transformedPoints;
+	DrawTriangleLines(points[0], points[1], points[2], player->object.color);
 #ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, YELLOW);
