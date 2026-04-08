@@ -1,6 +1,6 @@
 #include "objects.h"
-#include "raymath.h"
 #include <raylib.h>
+#include <raymath.h>
 
 void object_move(struct Object *obj) {
 	// Y axis grows downwards, so we need to negate the y coordinate
