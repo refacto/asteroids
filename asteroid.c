@@ -117,18 +117,27 @@ void asteroid_draw(struct Asteroid *asteroid) {
 	}
 }
 
+bool asteroid_collide_circle_coarse(struct Asteroid *asteroid, Vector2 position,
+									float radius) {
+	return CheckCollisionCircles(asteroid->object.position, asteroid->radius,
+								 position, radius);
+}
+
+bool asteroid_collide_point(struct Asteroid *asteroid, Vector2 point) {
+	return CheckCollisionPointPoly(point, asteroid->transformedPoints,
+								   ASTEROID_NUM_POINTS);
+}
+
 bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
 							 float radius) {
 	// if we aren't even in the mesh, we can't possibly collide
-	if (!CheckCollisionCircles(asteroid->object.position, asteroid->radius,
-							   position, radius)) {
+	if (!asteroid_collide_circle_coarse(asteroid, position, radius)) {
 		return false;
 	}
 	// this is fairly expensive
 	// we punt the radius, using the center will presumably work just fine
 	// TODO: figure out closest point if that assumption doesn't pan out
-	return CheckCollisionPointPoly(position, asteroid->transformedPoints,
-								   ASTEROID_NUM_POINTS);
+	return asteroid_collide_point(asteroid, position);
 }
 
 // TODO: remove, just here for demo

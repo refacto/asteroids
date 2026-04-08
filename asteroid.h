@@ -36,8 +36,18 @@ void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity);
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position);
 
+// checks if a midpoint of a circle hits the asteroid
+// this combines both coarse and fine collision detection and should
+// preferably be used if able
 bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
 							 float radius);
+
+// only checks if the outer asteroid circle hits, this is not yet a collision
+bool asteroid_collide_circle_coarse(struct Asteroid *asteroid, Vector2 position,
+									float radius);
+
+// fine grained collision detection of a point with the asteroid mesh, expensive
+bool asteroid_collide_point(struct Asteroid *asteroid, Vector2 point);
 
 // TODO: remove, just here for demo
 void asteroid_stop_moving(struct Asteroid *asteroid);
