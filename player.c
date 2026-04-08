@@ -133,6 +133,8 @@ void player_draw(struct Player *player) {
 #ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, YELLOW);
+	DrawCircleLines((int)player->object.position.x,
+					(int)player->object.position.y, SHIP_HEIGHT / 2.0, YELLOW);
 #endif
 	draw_shots(player);
 
@@ -146,18 +148,52 @@ void player_move(struct Player *player, Vector2 screen_dimensions) {
 	object_wrap_screen(&player->object, screen_dimensions, SHIP_HEIGHT);
 }
 
-enum CollisionResult player_check_collision(struct Player *player,
-											struct Asteroid *asteroid) {
-	enum CollisionResult ret = NO_HIT;
+static struct Shot *find_shot_collided(struct Player *player,
+									   struct Asteroid *asteroid) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		struct Shot *shot = &player->shots[i];
 		if (!shot->active) {
 			continue;
 		}
 		if (shot_collide_asteroid(shot, asteroid)) {
-			shot_stop_moving(shot);
-			return DESTROYED;
+			return shot;
 		};
 	}
-	return ret;
+	return nullptr;
+}
+
+static bool check_player_collided(struct Player *player,
+								  struct Asteroid *asteroid) {
+	if (!asteroid_collide_circle_coarse(asteroid, player->object.position,
+										SHIP_HEIGHT / 2.0)) {
+		return false;
+	}
+	// rather expensive, might need to optimize this further
+	for (int i = 0; i < PLAYER_NUM_POINTS; i++) {
+		if (asteroid_collide_point(asteroid, player->transformedPoints[i])) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void player_mark_shot(struct Player *player, bool shot) {
+	if (shot) {
+		player->object.color = RED;
+		return;
+	}
+	player->object.color = WHITE;
+}
+
+enum CollisionResult player_check_collision(struct Player *player,
+											struct Asteroid *asteroid) {
+	struct Shot *shot = find_shot_collided(player, asteroid);
+	if (shot) {
+		shot_stop_moving(shot);
+		return DESTROYED;
+	}
+	if (check_player_collided(player, asteroid)) {
+		return PLAYER_DAMAGE;
+	}
+	return NO_HIT;
 }

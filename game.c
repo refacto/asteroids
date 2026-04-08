@@ -52,21 +52,28 @@ void game_update(struct Game *game) {
 	}
 	player_update(&game->player);
 	asteroid = game->asteroids;
+	bool player_hit = false;
 	while (asteroid) {
 		enum CollisionResult res =
 			player_check_collision(&game->player, asteroid);
 		switch (res) {
 			case DESTROYED: {
+				// TODO: handle scoring
 				asteroid_stop_moving(asteroid);
 				break;
 			}
-			default: {
-				// TODO
+			case PLAYER_DAMAGE: {
+				// TODO: handle life tracking
+				player_hit = true;
+				break;
+			}
+			case NO_HIT: {
 				break;
 			}
 		}
 		asteroid = asteroid->next;
 	}
+	player_mark_shot(&game->player, player_hit);
 }
 
 void game_draw(struct Game *game) {

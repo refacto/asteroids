@@ -28,3 +28,6 @@ void player_draw(struct Player *player);
 void player_move(struct Player *player, Vector2 screen_dimensions);
 enum CollisionResult player_check_collision(struct Player *player,
 											struct Asteroid *asteroid);
+
+// TODO: remove, debug
+void player_mark_shot(struct Player *player, bool shot);
