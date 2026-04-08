@@ -57,3 +57,15 @@ void shot_fire(struct Shot *shot, Vector2 position, float rotation) {
 void shot_set_active(struct Shot *shot, bool active) {
 	shot->active = active;
 }
+
+bool shot_collide_asteroid(struct Shot *shot, struct Asteroid *asteroid) {
+	return asteroid_collide_circle(asteroid, shot->object.position,
+								   SHOT_RADIUS);
+}
+
+// TODO: remove, just here for demo
+void shot_stop_moving(struct Shot *shot) {
+	shot->object.velocity = Vector2Zero();
+	shot->object.thrust = 0;
+	shot->lifetime = 1000000;
+}
