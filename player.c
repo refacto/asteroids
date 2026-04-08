@@ -49,6 +49,7 @@ static void render_debug(struct Player *player) {
 	snprintf(buf, sizeof(buf), "thrust=%f\nspeed=%f", player->object.thrust,
 			 speed);
 	DrawText(buf, 0, 0, 12, WHITE);
+	DrawFPS(600, 0);
 };
 #endif
 
