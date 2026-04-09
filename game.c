@@ -1,6 +1,8 @@
 #include "game.h"
+#include "asteroid.h"
 #include "player.h"
 #include <raylib.h>
+#include <raymath.h>
 #include <stdlib.h>
 
 #define unused [[maybe_unused]]
@@ -43,12 +45,28 @@ void game_destroy(struct Game *game) {
 }
 
 void game_update(struct Game *game) {
-	struct Asteroid *cur = game->asteroids;
-	while (cur) {
-		asteroid_move(cur, game->screen_dimensions);
-		cur = cur->next;
+	struct Asteroid *asteroid = game->asteroids;
+	while (asteroid) {
+		asteroid_update(asteroid, game->screen_dimensions);
+		asteroid = asteroid->next;
 	}
 	player_update(&game->player);
+	asteroid = game->asteroids;
+	while (asteroid) {
+		enum CollisionResult res =
+			player_check_collision(&game->player, asteroid);
+		switch (res) {
+			case DESTROYED: {
+				asteroid_stop_moving(asteroid);
+				break;
+			}
+			default: {
+				// TODO
+				break;
+			}
+		}
+		asteroid = asteroid->next;
+	}
 }
 
 void game_draw(struct Game *game) {
