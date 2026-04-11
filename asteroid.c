@@ -8,7 +8,34 @@
 constexpr float ASTEROID_LARGE_RADIUS = 40.0f;
 constexpr int ASTEROID_MAX_VELOCITY = 4;
 
-static void populate_radius_scales(float offsets[ASTEROID_NUM_POINTS]) {
+struct AsteroidSpec {
+	int numPoints;
+	int radius;
+	float speed;
+};
+
+struct AsteroidSpec specs[_SIZE_MAX] = {
+	[SIZE_SMALL] =
+		{
+			.numPoints = 10,
+			.radius = 20,
+			.speed = 2,
+		},
+	[SIZE_MEDIUM] =
+		{
+			.numPoints = 10,
+			.radius = 30,
+			.speed = 1,
+		},
+	[SIZE_LARGE] =
+		{
+			.numPoints = 10,
+			.radius = 40,
+			.speed = 0.5,
+		},
+};
+
+static void populate_radius_scales(int numPoints, float offsets[numPoints]) {
 	for (int i = 0; i < ASTEROID_NUM_POINTS; i++) {
 		if (GetRandomValue(0, 1)) {
 			offsets[i] = 1.0f;

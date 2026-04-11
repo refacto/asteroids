@@ -2,14 +2,22 @@
 #include "objects.h"
 
 constexpr int ASTEROID_NUM_POINTS = 10;
+constexpr int ASTEROID_MAX_NUM_POINTS = 10;
+
+enum AsteroidSize {
+	SIZE_SMALL,
+	SIZE_MEDIUM,
+	SIZE_LARGE,
+	_SIZE_MAX, // EOL
+};
 
 struct Asteroid {
 	struct Object object;
-	float radius;
+	enum AsteroidSize size;
 	// raw shape points, centered at the origin
-	Vector2 points[ASTEROID_NUM_POINTS];
+	Vector2 points[ASTEROID_MAX_NUM_POINTS];
 	// logical shape points, rotated and centered around the position
-	Vector2 transformedPoints[ASTEROID_NUM_POINTS];
+	Vector2 transformedPoints[ASTEROID_MAX_NUM_POINTS];
 	// intrusive linked list
 	struct Asteroid *next;
 };
