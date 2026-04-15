@@ -1,4 +1,5 @@
 #include "asteroidShower.h"
+#include "asteroid.h"
 #include <math.h>
 #include <raylib.h>
 
@@ -17,8 +18,9 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 		.y = speed * sinf((float)deg * DEG2RAD),
 	};
 	for (int i = 0; i < ASTEROID_SHOWER_COUNT; i++) {
-		asteroid_init(&as->asteroids[i]);
-		asteroid_set_velocity(&as->asteroids[i], velocity);
+		struct Asteroid *asteroid = &as->asteroids[i];
+		asteroid_init(asteroid);
+		asteroid_set_velocity(asteroid, velocity);
 		Vector2 pos;
 		bool overlaps;
 		do {
@@ -26,18 +28,15 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 				.x = (float)GetRandomValue(0, (int)screenDimensions.x),
 				.y = (float)GetRandomValue(0, (int)screenDimensions.y),
 			};
-			// TODO: we should use the future general collision logic here
+			asteroid_set_position(asteroid, pos);
 			overlaps = false;
 			for (int j = 0; j < i; j++) {
-				if (CheckCollisionCircles(pos, as->asteroids[i].radius,
-										  as->asteroids[j].object.position,
-										  as->asteroids[j].radius)) {
+				if (asteroid_collide_asteroid(asteroid, &as->asteroids[j])) {
 					overlaps = true;
 					break;
 				}
 			}
 		} while (overlaps);
-		asteroid_set_position(&as->asteroids[i], pos);
 	}
 }
 
