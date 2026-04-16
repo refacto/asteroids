@@ -6,7 +6,10 @@ constexpr int ASTEROID_NUM_POINTS = 10;
 struct Asteroid {
 	struct Object object;
 	float radius;
+	// raw shape points, centered at the origin
 	Vector2 points[ASTEROID_NUM_POINTS];
+	// logical shape points, rotated and centered around the position
+	Vector2 transformedPoints[ASTEROID_NUM_POINTS];
 	// intrusive linked list
 	struct Asteroid *next;
 };
@@ -27,8 +30,24 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next);
 // draws the asteroid
 void asteroid_draw(struct Asteroid *asteroid);
 
-void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions);
+void asteroid_update(struct Asteroid *asteroid, Vector2 screen_dimensions);
 
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity);
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position);
+
+// checks if a midpoint of a circle hits the asteroid
+// this combines both coarse and fine collision detection and should
+// preferably be used if able
+bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
+							 float radius);
+
+// only checks if the outer asteroid circle hits, this is not yet a collision
+bool asteroid_collide_circle_coarse(struct Asteroid *asteroid, Vector2 position,
+									float radius);
+
+// fine grained collision detection of a point with the asteroid mesh, expensive
+bool asteroid_collide_point(struct Asteroid *asteroid, Vector2 point);
+
+// TODO: remove, just here for demo
+void asteroid_stop_moving(struct Asteroid *asteroid);
