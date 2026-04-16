@@ -129,6 +129,6 @@ void title_screen_update(struct ScreenController *ctrl, void *data) {
 	title_update((struct Title *)data, ctrl);
 }
 
-void title_screen_draw(unused struct ScreenController *ctrl, void *data) {
+void title_screen_draw(void *data) {
 	title_draw((struct Title *)data);
 }
