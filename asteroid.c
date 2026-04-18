@@ -109,7 +109,7 @@ void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next) {
 }
 
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity) {
-	asteroid->object.velocity = velocity;
+	object_set_velocity(&asteroid->object, velocity);
 }
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
