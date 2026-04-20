@@ -1,8 +1,6 @@
 #include "player.h"
 #include "asteroid.h"
-#include "input.h"
 #include "objects.h"
-#include "shot.h"
 #include <raylib.h>
 #include <raymath.h>
 #ifdef DEBUG_SHIP
@@ -35,9 +33,6 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 				.color = WHITE,
 			},
 	};
-	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
-		shot_init(&player->shots[i]);
-	}
 	fill_points(player->points);
 }
 
@@ -57,45 +52,8 @@ static Vector2 shiphead_position(struct Player *player) {
 	return player->transformedPoints[0];
 }
 
-static struct Shot *get_inactive_shot(struct Player *player) {
-	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
-		struct Shot *cur = &player->shots[i];
-		if (!cur->active) {
-			return cur;
-		}
-	}
-	return nullptr;
-}
-
-static void try_fire_shot(struct Player *player) {
-	struct Shot *shot = get_inactive_shot(player);
-	if (!shot) {
-		return; // exceeded the maximum amount of bullets
-	}
-	Vector2 startpos = shiphead_position(player);
-	shot_fire(shot, startpos, player->object.rotation);
-}
-
-static void handle_input(struct Player *player) {
-	constexpr float rotation_increment = 5;
-	if (input_key_down(ACTION_LEFT)) {
-		object_rotate(&player->object, -rotation_increment);
-	}
-	if (input_key_down(ACTION_RIGHT)) {
-		object_rotate(&player->object, rotation_increment);
-	}
-	constexpr float thrust_inc = 0.2f;
-	if (input_key_down(ACTION_UP)) {
-		object_thrust_inc(&player->object, thrust_inc);
-	} else {
-		object_thrust_inc(&player->object, -thrust_inc / 2);
-	}
-	if (input_key_down(ACTION_DOWN)) {
-		object_thrust_inc(&player->object, -thrust_inc);
-	}
-	if (input_key_once(ACTION_EXECUTE)) {
-		try_fire_shot(player);
-	}
+Vector2 player_cannon_position(struct Player *player) {
+	return shiphead_position(player);
 }
 
 // moves the origin centered shape points to the logical location on screen,
@@ -107,24 +65,10 @@ static void transform_points(struct Player *player) {
 	}
 }
 
-static void update_shots(struct Player *player) {
-	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
-		shot_update(&player->shots[i]);
-	}
-}
-
 void player_update(struct Player *player) {
-	handle_input(player);
-	update_shots(player);
 	// FIXME: this should be passed in to update
 	player_move(player, (Vector2){.x = 800, .y = 450});
 	transform_points(player);
-}
-
-static void draw_shots(struct Player *player) {
-	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
-		shot_draw(&player->shots[i]);
-	}
 }
 
 void player_draw(struct Player *player) {
@@ -135,10 +79,6 @@ void player_draw(struct Player *player) {
 			   3, YELLOW);
 	DrawCircleLines((int)player->object.position.x,
 					(int)player->object.position.y, SHIP_HEIGHT / 2.0, YELLOW);
-#endif
-	draw_shots(player);
-
-#ifdef DEBUG_SHIP
 	render_debug(player);
 #endif
 }
@@ -148,22 +88,23 @@ void player_move(struct Player *player, Vector2 screen_dimensions) {
 	object_wrap_screen(&player->object, screen_dimensions, SHIP_HEIGHT);
 }
 
-static struct Shot *find_shot_collided(struct Player *player,
-									   struct Asteroid *asteroid) {
-	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
-		struct Shot *shot = &player->shots[i];
-		if (!shot->active) {
-			continue;
-		}
-		if (shot_collide_asteroid(shot, asteroid)) {
-			return shot;
-		};
-	}
-	return nullptr;
+void player_rotate(struct Player *player, float delta) {
+	object_rotate(&player->object, delta);
 }
 
-static bool check_player_collided(struct Player *player,
-								  struct Asteroid *asteroid) {
+void player_thrust_inc(struct Player *player, float delta) {
+	object_thrust_inc(&player->object, delta);
+}
+
+void player_mark_shot(struct Player *player, bool shot) {
+	if (shot) {
+		player->object.color = RED;
+		return;
+	}
+	player->object.color = WHITE;
+}
+
+bool player_check_collision(struct Player *player, struct Asteroid *asteroid) {
 	if (!asteroid_collide_circle_coarse(asteroid, player->object.position,
 										SHIP_HEIGHT / 2.0)) {
 		return false;
@@ -175,25 +116,4 @@ static bool check_player_collided(struct Player *player,
 		}
 	}
 	return false;
-}
-
-void player_mark_shot(struct Player *player, bool shot) {
-	if (shot) {
-		player->object.color = RED;
-		return;
-	}
-	player->object.color = WHITE;
-}
-
-enum CollisionResult player_check_collision(struct Player *player,
-											struct Asteroid *asteroid) {
-	struct Shot *shot = find_shot_collided(player, asteroid);
-	if (shot) {
-		shot_stop_moving(shot);
-		return DESTROYED;
-	}
-	if (check_player_collided(player, asteroid)) {
-		return PLAYER_DAMAGE;
-	}
-	return NO_HIT;
 }
