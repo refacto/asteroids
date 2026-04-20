@@ -4,12 +4,37 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-constexpr float ASTEROID_LARGE_RADIUS = 40.0f;
-constexpr int ASTEROID_MAX_VELOCITY = 4;
+struct AsteroidSpec {
+	int numPoints;
+	float radius;
+	float speed;
+};
 
-static void populate_radius_scales(float offsets[ASTEROID_NUM_POINTS]) {
-	for (int i = 0; i < ASTEROID_NUM_POINTS; i++) {
+struct AsteroidSpec specs[_SIZE_MAX] = {
+	[SIZE_SMALL] =
+		{
+			.numPoints = 10,
+			.radius = 20.0f,
+			.speed = 2,
+		},
+	[SIZE_MEDIUM] =
+		{
+			.numPoints = 10,
+			.radius = 30.0f,
+			.speed = 1,
+		},
+	[SIZE_LARGE] =
+		{
+			.numPoints = 10,
+			.radius = 40.0f,
+			.speed = 0.5,
+		},
+};
+
+static void populate_radius_scales(int numPoints, float offsets[]) {
+	for (int i = 0; i < numPoints; i++) {
 		if (GetRandomValue(0, 1)) {
 			offsets[i] = 1.0f;
 		} else {
@@ -18,20 +43,20 @@ static void populate_radius_scales(float offsets[ASTEROID_NUM_POINTS]) {
 	}
 }
 
-static void fill_points(Vector2 points[ASTEROID_NUM_POINTS], float radius) {
+static void fill_points(int numPoints, Vector2 points[], float radius) {
 	// We spread points around a unit circle: half sit on the circle (1.0),
 	// the other half are shifted inward for a jagged asteroid shape
-	float radiusScaleFactors[ASTEROID_NUM_POINTS];
-	populate_radius_scales(radiusScaleFactors);
-	float angle_step = 360.0f / ASTEROID_NUM_POINTS;
-	for (int i = 0; i < ASTEROID_NUM_POINTS; i++) {
+	float radiusScaleFactors[ASTEROID_MAX_NUM_POINTS];
+	populate_radius_scales(numPoints, radiusScaleFactors);
+	float angle_step = 360.0f / (float)numPoints;
+	for (int i = 0; i < numPoints; i++) {
 		float alpha = (float)i * angle_step * DEG2RAD;
 		points[i].x = cosf(alpha) * radius * radiusScaleFactors[i];
 		points[i].y = sinf(alpha) * radius * radiusScaleFactors[i];
 	}
 }
 
-static Vector2 random_velocity(int speed) {
+static Vector2 random_velocity(float speed) {
 	int deg = GetRandomValue(0, 360);
 	return (Vector2){
 		.x = (float)(speed * cos((float)deg * DEG2RAD)),
@@ -39,17 +64,35 @@ static Vector2 random_velocity(int speed) {
 	};
 }
 
-void asteroid_init(struct Asteroid *asteroid) {
+static void asteroid_init_sized(struct Asteroid *asteroid,
+								enum AsteroidSize size) {
+	struct AsteroidSpec spec = specs[size];
 	*asteroid = (struct Asteroid){
-		.radius = ASTEROID_LARGE_RADIUS,
+		.size = size,
 		.object =
 			{
-				.velocity = random_velocity(1),
-				.max_velocity = ASTEROID_MAX_VELOCITY,
+				.velocity = random_velocity(spec.speed),
+				.max_velocity = spec.speed,
 				.thrust = 0,
 			},
 	};
-	fill_points(asteroid->points, asteroid->radius);
+	fill_points(spec.numPoints, asteroid->points, spec.radius);
+}
+
+void asteroid_init(struct Asteroid *asteroid) {
+	asteroid_init_sized(asteroid, SIZE_LARGE);
+}
+
+struct Asteroid *asteroid_new() {
+	struct Asteroid *asteroid = malloc(sizeof(*asteroid));
+	asteroid_init(asteroid);
+	return asteroid;
+}
+
+static struct Asteroid *asteroid_new_sized(enum AsteroidSize size) {
+	struct Asteroid *asteroid = malloc(sizeof(*asteroid));
+	asteroid_init_sized(asteroid, size);
+	return asteroid;
 }
 
 bool asteroid_has_next(const struct Asteroid *asteroid) {
@@ -74,21 +117,67 @@ void asteroid_add(struct Asteroid *head, struct Asteroid *new) {
 	head->next = new;
 }
 
+void asteroid_remove(struct Asteroid **head, struct Asteroid *target) {
+	if (!head) {
+		return; // bad input
+	}
+	while (*head && *head != target) {
+		head = &(*head)->next;
+	}
+	if (!*head) {
+		return; // item wasn't on the list
+	}
+	*head = (*head)->next;
+}
+
 void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next) {
 	asteroid->next = next;
 }
 
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity) {
-	asteroid->object.velocity = velocity;
+	object_set_velocity(&asteroid->object, velocity);
 }
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
 	asteroid->object.position = position;
 }
 
+bool asteroid_can_split(struct Asteroid *asteroid) {
+	return asteroid->size > SIZE_SMALL;
+}
+
+static Vector2 perpendicularNormVector(Vector2 original) {
+	return Vector2Normalize((Vector2){
+		.x = original.y,
+		.y = -original.x,
+	});
+}
+
+struct Asteroid *asteroid_split(struct Asteroid *asteroid,
+								Vector2 damageDirection) {
+	if (asteroid->size == SIZE_SMALL) {
+		return nullptr;
+	}
+	enum AsteroidSize newSize = asteroid->size - 1;
+	struct Asteroid *left = asteroid_new_sized(newSize);
+	struct Asteroid *right = asteroid_new_sized(newSize);
+	left->size = newSize;
+	right->size = newSize;
+	left->object.position = asteroid->object.position;
+	right->object.position = asteroid->object.position;
+	// TODO add some randomization
+	Vector2 newVelocity = perpendicularNormVector(damageDirection);
+	float newSpeed = specs[newSize].speed;
+	left->object.velocity = Vector2Scale(newVelocity, newSpeed);
+	right->object.velocity = Vector2Scale(newVelocity, -newSpeed);
+	asteroid_set_next(left, right);
+	return left;
+}
+
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
 	object_move(&asteroid->object);
-	object_wrap_screen(&asteroid->object, screen_dimensions, asteroid->radius);
+	struct AsteroidSpec spec = specs[asteroid->size];
+	object_wrap_screen(&asteroid->object, screen_dimensions, spec.radius);
 }
 
 // moves the origin centered shape points to the logical location on screen,
@@ -119,7 +208,8 @@ void asteroid_draw(struct Asteroid *asteroid) {
 
 bool asteroid_collide_circle_coarse(struct Asteroid *asteroid, Vector2 position,
 									float radius) {
-	return CheckCollisionCircles(asteroid->object.position, asteroid->radius,
+	struct AsteroidSpec spec = specs[asteroid->size];
+	return CheckCollisionCircles(asteroid->object.position, spec.radius,
 								 position, radius);
 }
 
@@ -138,6 +228,15 @@ bool asteroid_collide_circle(struct Asteroid *asteroid, Vector2 position,
 	// we punt the radius, using the center will presumably work just fine
 	// TODO: figure out closest point if that assumption doesn't pan out
 	return asteroid_collide_point(asteroid, position);
+}
+
+bool asteroid_collide_asteroid(struct Asteroid *self, struct Asteroid *other) {
+	// this should be good enough but...
+	// TODO: collision within mesh
+	struct AsteroidSpec selfSpec = specs[self->size];
+	struct AsteroidSpec otherSpec = specs[other->size];
+	return CheckCollisionCircles(self->object.position, selfSpec.radius,
+								 other->object.position, otherSpec.radius);
 }
 
 // TODO: remove, just here for demo

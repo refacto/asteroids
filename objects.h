@@ -29,3 +29,6 @@ void object_rotate(struct Object *obj, float delta);
 
 // add delta to thrust, capping at max_thrust
 void object_thrust_inc(struct Object *obj, float delta);
+
+// sets the new velocity, overriding the max speed if needed
+void object_set_velocity(struct Object *obj, Vector2 velocity);
