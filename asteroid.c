@@ -47,7 +47,7 @@ static void fill_points(int numPoints, Vector2 points[], float radius) {
 	// the other half are shifted inward for a jagged asteroid shape
 	float radiusScaleFactors[ASTEROID_MAX_NUM_POINTS];
 	populate_radius_scales(numPoints, radiusScaleFactors);
-	float angle_step = 360.0f / ASTEROID_NUM_POINTS;
+	float angle_step = 360.0f / (float)numPoints;
 	for (int i = 0; i < numPoints; i++) {
 		float alpha = (float)i * angle_step * DEG2RAD;
 		points[i].x = cosf(alpha) * radius * radiusScaleFactors[i];
@@ -67,7 +67,7 @@ static void asteroid_init_sized(struct Asteroid *asteroid,
 								enum AsteroidSize size) {
 	struct AsteroidSpec spec = specs[size];
 	*asteroid = (struct Asteroid){
-		.size = SIZE_LARGE,
+		.size = size,
 		.object =
 			{
 				.velocity = random_velocity(spec.speed),
