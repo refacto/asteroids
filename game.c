@@ -152,6 +152,9 @@ static void handle_collisions(struct Game *game) {
 		asteroid = asteroid->next;
 	}
 	// TODO: handle life tracking
+	if (player_hit) {
+		player_set_invincible(&game->player);
+	}
 	player_mark_shot(&game->player, player_hit);
 }
 

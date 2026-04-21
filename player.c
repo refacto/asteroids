@@ -1,5 +1,6 @@
 #include "player.h"
 #include "asteroid.h"
+#include "blink.h"
 #include "objects.h"
 #include <raylib.h>
 #include <raymath.h>
@@ -10,6 +11,7 @@
 constexpr int PLAYER_STARTING_LIVES = 3;
 constexpr float SHIP_HEIGHT = 27.47f;
 constexpr float SHIP_BASE = 20.0f;
+constexpr float INVINCIBILITY_DURATION = 2.0f;
 
 static void fill_points(Vector2 points[PLAYER_NUM_POINTS]) {
 	points[0] = (Vector2){.y = -SHIP_HEIGHT / 2}; // ship head
@@ -32,6 +34,7 @@ void player_init(struct Player *player, Vector2 screen_dimensions) {
 				.max_thrust = 4,
 				.color = WHITE,
 			},
+		.blinker = {.halfPeriod = 0.1f}, // invincibility blinker
 	};
 	fill_points(player->points);
 }
@@ -65,15 +68,27 @@ static void transform_points(struct Player *player) {
 	}
 }
 
+static void update_invincibility(struct Player *player) {
+	if (!player_is_invincible(player)) {
+		return;
+	}
+	float frameTime = GetFrameTime();
+	player->invincibilityTimer -= frameTime;
+	blink_update(&player->blinker, frameTime);
+	if (player->invincibilityTimer <= 0) {
+		player->invincibilityTimer = 0;
+		blink_reset(&player->blinker);
+	}
+}
+
 void player_update(struct Player *player) {
 	// FIXME: this should be passed in to update
 	player_move(player, (Vector2){.x = 800, .y = 450});
 	transform_points(player);
+	update_invincibility(player);
 }
 
 void player_draw(struct Player *player) {
-	Vector2 *points = player->transformedPoints;
-	DrawTriangleLines(points[0], points[1], points[2], player->object.color);
 #ifdef DEBUG_SHIP
 	DrawCircle((int)player->object.position.x, (int)player->object.position.y,
 			   3, YELLOW);
@@ -81,6 +96,11 @@ void player_draw(struct Player *player) {
 					(int)player->object.position.y, SHIP_HEIGHT / 2.0, YELLOW);
 	render_debug(player);
 #endif
+	if (player_is_invincible(player) && !blink_should_draw(&player->blinker)) {
+		return;
+	}
+	Vector2 *points = player->transformedPoints;
+	DrawTriangleLines(points[0], points[1], points[2], player->object.color);
 }
 
 void player_move(struct Player *player, Vector2 screen_dimensions) {
@@ -105,6 +125,9 @@ void player_mark_shot(struct Player *player, bool shot) {
 }
 
 bool player_check_collision(struct Player *player, struct Asteroid *asteroid) {
+	if (player_is_invincible(player)) {
+		return false;
+	}
 	if (!asteroid_collide_circle_coarse(asteroid, player->object.position,
 										SHIP_HEIGHT / 2.0)) {
 		return false;
@@ -116,4 +139,12 @@ bool player_check_collision(struct Player *player, struct Asteroid *asteroid) {
 		}
 	}
 	return false;
+}
+
+bool player_is_invincible(struct Player *player) {
+	return player->invincibilityTimer > 0;
+}
+
+void player_set_invincible(struct Player *player) {
+	player->invincibilityTimer = INVINCIBILITY_DURATION;
 }
