@@ -38,5 +38,5 @@ void screen_update(struct ScreenController *controller) {
 }
 
 void screen_draw(struct ScreenController *controller) {
-	controller->active->draw(controller, controller->active->data);
+	controller->active->draw(controller->active->data);
 }

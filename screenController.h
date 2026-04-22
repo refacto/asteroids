@@ -11,7 +11,7 @@ struct ScreenController; // fwd declaration
 
 struct Screen {
 	void (*update)(struct ScreenController *ctrl, void *data);
-	void (*draw)(struct ScreenController *ctrl, void *data);
+	void (*draw)(void *data);
 	void *data; // callback data
 };
 

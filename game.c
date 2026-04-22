@@ -175,6 +175,6 @@ void game_screen_update(unused struct ScreenController *ctrl, void *data) {
 	game_update((struct Game *)data);
 }
 
-void game_screen_draw(unused struct ScreenController *ctrl, void *data) {
+void game_screen_draw(void *data) {
 	game_draw((struct Game *)data);
 }

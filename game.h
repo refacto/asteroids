@@ -22,4 +22,4 @@ void game_update(struct Game *game);
 void game_draw(struct Game *game);
 
 void game_screen_update(struct ScreenController *ctrl, void *data);
-void game_screen_draw(struct ScreenController *ctrl, void *data);
+void game_screen_draw(void *data);

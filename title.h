@@ -20,4 +20,4 @@ void title_update(struct Title *title, struct ScreenController *ctrl);
 void title_draw(struct Title *title);
 
 void title_screen_update(struct ScreenController *ctrl, void *data);
-void title_screen_draw(struct ScreenController *ctrl, void *data);
+void title_screen_draw(void *data);
