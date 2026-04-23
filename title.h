@@ -7,13 +7,11 @@
 
 struct Title {
 	bool isGameOver;
-	Vector2 screenDimensions;
 	struct FontLoader *fontLoader;
 	struct AsteroidShower asteroidShower;
 };
 
-void title_init(struct Title *title, struct FontLoader *fontLoader,
-				int screenWidth, int screenHeight);
+void title_init(struct Title *title, struct FontLoader *fontLoader);
 void title_destroy(struct Title *title);
 
 void title_update(struct Title *title, struct ScreenController *ctrl);

@@ -2,6 +2,7 @@
 #include "game.h"
 #include "globalActions.h"
 #include "screenController.h"
+#include "screenDimensions.h"
 #include "title.h"
 
 #include <raylib.h>
@@ -14,12 +15,14 @@ int main(void) {
 	InitWindow(screenWidth, screenHeight, "Asteroids");
 	SetTargetFPS(60);
 
+	screenDimensions_set(screenWidth, screenHeight);
+
 	struct FontLoader *fontLoader = &(struct FontLoader){};
 	fontLoader_init(fontLoader);
 	struct Game *game = &(struct Game){};
 	game_init(game, screenWidth, screenHeight);
 	struct Title *title = &(struct Title){};
-	title_init(title, fontLoader, screenWidth, screenHeight);
+	title_init(title, fontLoader);
 
 	struct ScreenController *screenController = &(struct ScreenController){};
 	screen_register(screenController, SCREEN_TITLE,
