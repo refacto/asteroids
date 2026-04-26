@@ -13,6 +13,10 @@ struct Game {
 	struct Asteroid *asteroids;
 	struct Shot shots[MAX_NUM_SHOTS];
 	Vector2 screen_dimensions;
+	Sound shoot_sound;
+	Sound player_hit_sound;
+	Sound asteroid_hit_sound;
+	bool player_was_hit;
 };
 
 void game_init(struct Game *game, int screenWidth, int screenHeight);

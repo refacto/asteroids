@@ -13,6 +13,7 @@ void shot_fire(struct Shot *shot, Vector2 position, float rotation);
 void shot_update(struct Shot *shot);
 void shot_draw(struct Shot *shot);
 void shot_move(struct Shot *shot, Vector2 screen_dimensions);
+void shot_set_active(struct Shot *shot, bool active);
 bool shot_collide_asteroid(struct Shot *shot, struct Asteroid *asteroid);
 
 // TODO: remove, just here for demo

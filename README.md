@@ -71,3 +71,7 @@ A pre-commit hook is included in `.githooks/` that automatically formats staged 
 ```sh
 git config core.hooksPath .githooks
 ```
+
+### Sounds
+
+The sounds were made using [rFXGen](https://raylibtech.itch.io/rfxgen). You can find the rFX files in `resources/audio` to load, edit and export them again to modify them.

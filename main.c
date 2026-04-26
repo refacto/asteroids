@@ -12,6 +12,7 @@ int main(void) {
 	const int screenHeight = 450;
 
 	InitWindow(screenWidth, screenHeight, "Asteroids");
+	InitAudioDevice();
 	SetTargetFPS(60);
 
 	struct FontLoader *fontLoader = &(struct FontLoader){};
@@ -47,6 +48,7 @@ int main(void) {
 	title_destroy(title);
 	game_destroy(game);
 	fontLoader_destroy(fontLoader);
+	CloseAudioDevice();
 	CloseWindow();
 	return EXIT_SUCCESS;
 }
