@@ -52,3 +52,11 @@ void object_thrust_inc(struct Object *obj, float delta) {
 		obj->thrust = 0;
 	}
 }
+
+void object_set_velocity(struct Object *obj, Vector2 velocity) {
+	float speed = Vector2Length(velocity);
+	if (speed > obj->max_velocity) {
+		obj->max_velocity = speed;
+	}
+	obj->velocity = velocity;
+}

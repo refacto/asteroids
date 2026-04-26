@@ -30,9 +30,9 @@ void game_init(struct Game *game, int screenWidth, int screenHeight,
 	player_init(&game->player, game->screen_dimensions);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
-		struct Asteroid *asteroid = malloc(sizeof(*asteroid));
-		asteroid_init(asteroid);
-		asteroid->object.position = random_location(game->screen_dimensions);
+		struct Asteroid *asteroid = asteroid_new();
+		asteroid_set_position(asteroid,
+							  random_location(game->screen_dimensions));
 		asteroid_set_next(asteroid, last);
 		last = asteroid;
 	}
@@ -129,27 +129,39 @@ static bool collide_asteroid_shots(struct Game *game,
 		return false;
 	}
 	// TODO: handle scoring
+	Vector2 damageDirection = shot->object.velocity;
 	shot_set_active(shot, false);
-	asteroid_stop_moving(asteroid);
+	if (asteroid_can_split(asteroid)) {
+		struct Asteroid *asteroids = asteroid_split(asteroid, damageDirection);
+		asteroid_add(game->asteroids, asteroids);
+	}
 	soundFx_play(game->sfx, SFX_ASTEROID_HIT);
 	return true;
 }
 
 static void handle_collisions(struct Game *game) {
 	bool player_hit = false;
-	for (struct Asteroid *asteroid = game->asteroids; asteroid;
-		 asteroid = asteroid->next) {
+	struct Asteroid *asteroid = game->asteroids;
+	while (asteroid) {
 		if (collide_asteroid_shots(game, asteroid)) {
+			asteroid_remove(&game->asteroids, asteroid);
+			struct Asteroid *next = asteroid->next;
+			free(asteroid);
+			asteroid = next;
 			// don't want to check for player collision
 			continue;
 		}
 		// this short circuits, so the player can only be hit once currently
 		player_hit =
 			player_hit || player_check_collision(&game->player, asteroid);
+		asteroid = asteroid->next;
 	}
-	soundFx_play(game->sfx, SFX_PLAYER_HIT);
 	game->player_was_hit = player_hit;
 	// TODO: handle life tracking
+	if (player_hit) {
+		soundFx_play(game->sfx, SFX_PLAYER_HIT);
+		player_set_invincible(&game->player);
+	}
 	player_mark_shot(&game->player, player_hit);
 }
 

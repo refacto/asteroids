@@ -1,9 +1,11 @@
 #include "asteroid.h"
+#include "malloc.h"
 #include "objects.h"
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 struct AsteroidSpec {
 	int numPoints;
@@ -82,6 +84,18 @@ void asteroid_init(struct Asteroid *asteroid) {
 	asteroid_init_sized(asteroid, SIZE_LARGE);
 }
 
+struct Asteroid *asteroid_new() {
+	struct Asteroid *asteroid = xmalloc(sizeof(*asteroid));
+	asteroid_init(asteroid);
+	return asteroid;
+}
+
+static struct Asteroid *asteroid_new_sized(enum AsteroidSize size) {
+	struct Asteroid *asteroid = xmalloc(sizeof(*asteroid));
+	asteroid_init_sized(asteroid, size);
+	return asteroid;
+}
+
 bool asteroid_has_next(const struct Asteroid *asteroid) {
 	return asteroid && asteroid->next != nullptr;
 }
@@ -104,16 +118,59 @@ void asteroid_add(struct Asteroid *head, struct Asteroid *new) {
 	head->next = new;
 }
 
+void asteroid_remove(struct Asteroid **head, struct Asteroid *target) {
+	if (!head) {
+		return; // bad input
+	}
+	while (*head && *head != target) {
+		head = &(*head)->next;
+	}
+	if (!*head) {
+		return; // item wasn't on the list
+	}
+	*head = (*head)->next;
+}
+
 void asteroid_set_next(struct Asteroid *asteroid, struct Asteroid *next) {
 	asteroid->next = next;
 }
 
 void asteroid_set_velocity(struct Asteroid *asteroid, Vector2 velocity) {
-	asteroid->object.velocity = velocity;
+	object_set_velocity(&asteroid->object, velocity);
 }
 
 void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
 	asteroid->object.position = position;
+}
+
+bool asteroid_can_split(const struct Asteroid *asteroid) {
+	return asteroid->size > SIZE_SMALL;
+}
+
+static Vector2 perpendicular_norm_vector(Vector2 original) {
+	return Vector2Normalize((Vector2){
+		.x = original.y,
+		.y = -original.x,
+	});
+}
+
+struct Asteroid *asteroid_split(const struct Asteroid *asteroid,
+								Vector2 damageDirection) {
+	if (asteroid->size == SIZE_SMALL) {
+		return nullptr;
+	}
+	enum AsteroidSize newSize = asteroid->size - 1;
+	struct Asteroid *left = asteroid_new_sized(newSize);
+	struct Asteroid *right = asteroid_new_sized(newSize);
+	left->object.position = asteroid->object.position;
+	right->object.position = asteroid->object.position;
+	// TODO add some randomization
+	Vector2 newVelocity = perpendicular_norm_vector(damageDirection);
+	float newSpeed = specs[newSize].speed;
+	asteroid_set_velocity(left, Vector2Scale(newVelocity, newSpeed));
+	asteroid_set_velocity(right, Vector2Scale(newVelocity, -newSpeed));
+	asteroid_set_next(left, right);
+	return left;
 }
 
 void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
