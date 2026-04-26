@@ -84,5 +84,6 @@ srcs = [
   'blink.c',
   'asteroidShower.c',
   'globalActions.c',
+  'soundFx.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])

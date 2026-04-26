@@ -3,6 +3,7 @@
 #include "input.h"
 #include "player.h"
 #include "shot.h"
+#include "soundFx.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <stdlib.h>
@@ -16,13 +17,15 @@ static Vector2 random_location(Vector2 screen_dimensions) {
 	};
 }
 
-void game_init(struct Game *game, int screenWidth, int screenHeight) {
+void game_init(struct Game *game, int screenWidth, int screenHeight,
+			   struct SoundFx *sfx) {
 	*game = (struct Game){
 		.screen_dimensions =
 			{
 				.x = (float)screenWidth,
 				.y = (float)screenHeight,
 			},
+		.sfx = sfx,
 	};
 	player_init(&game->player, game->screen_dimensions);
 	struct Asteroid *last = nullptr;
@@ -66,6 +69,7 @@ static void try_fire_shot(struct Game *game) {
 	}
 	Vector2 startpos = player_cannon_position(&game->player);
 	shot_fire(shot, startpos, game->player.object.rotation);
+	soundFx_play(game->sfx, SFX_SHOOT);
 }
 
 static void update_shots(struct Game *game) {
@@ -131,6 +135,7 @@ static bool collide_asteroid_shots(struct Game *game,
 		struct Asteroid *asteroids = asteroid_split(asteroid, damageDirection);
 		asteroid_add(game->asteroids, asteroids);
 	}
+	soundFx_play(game->sfx, SFX_ASTEROID_HIT);
 	return true;
 }
 
@@ -153,6 +158,7 @@ static void handle_collisions(struct Game *game) {
 	}
 	// TODO: handle life tracking
 	if (player_hit) {
+		soundFx_play(game->sfx, SFX_PLAYER_HIT);
 		player_set_invincible(&game->player);
 	}
 	player_mark_shot(&game->player, player_hit);

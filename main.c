@@ -2,6 +2,7 @@
 #include "game.h"
 #include "globalActions.h"
 #include "screenController.h"
+#include "soundFx.h"
 #include "title.h"
 
 #include <raylib.h>
@@ -12,12 +13,15 @@ int main(void) {
 	const int screenHeight = 450;
 
 	InitWindow(screenWidth, screenHeight, "Asteroids");
+	InitAudioDevice();
 	SetTargetFPS(60);
 
 	struct FontLoader *fontLoader = &(struct FontLoader){};
 	fontLoader_init(fontLoader);
+	struct SoundFx *sfx = &(struct SoundFx){};
+	soundFx_init(sfx);
 	struct Game *game = &(struct Game){};
-	game_init(game, screenWidth, screenHeight);
+	game_init(game, screenWidth, screenHeight, sfx);
 	struct Title *title = &(struct Title){};
 	title_init(title, fontLoader, screenWidth, screenHeight);
 
@@ -46,7 +50,9 @@ int main(void) {
 
 	title_destroy(title);
 	game_destroy(game);
+	soundFx_destroy(sfx);
 	fontLoader_destroy(fontLoader);
+	CloseAudioDevice();
 	CloseWindow();
 	return EXIT_SUCCESS;
 }
