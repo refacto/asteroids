@@ -1,4 +1,5 @@
 #include "asteroid.h"
+#include "malloc.h"
 #include "objects.h"
 #include <math.h>
 #include <raylib.h>
@@ -84,13 +85,13 @@ void asteroid_init(struct Asteroid *asteroid) {
 }
 
 struct Asteroid *asteroid_new() {
-	struct Asteroid *asteroid = malloc(sizeof(*asteroid));
+	struct Asteroid *asteroid = xmalloc(sizeof(*asteroid));
 	asteroid_init(asteroid);
 	return asteroid;
 }
 
 static struct Asteroid *asteroid_new_sized(enum AsteroidSize size) {
-	struct Asteroid *asteroid = malloc(sizeof(*asteroid));
+	struct Asteroid *asteroid = xmalloc(sizeof(*asteroid));
 	asteroid_init_sized(asteroid, size);
 	return asteroid;
 }
