@@ -80,6 +80,7 @@ srcs = [
   'fontLoader.c',
   'objects.c',
   'title.c',
+  'malloc.c',
   'asteroidShower.c',
   'globalActions.c',
 ]
