@@ -16,7 +16,6 @@ struct Game {
 	struct Shot shots[MAX_NUM_SHOTS];
 	Vector2 screen_dimensions;
 	struct SoundFx *sfx;
-	bool player_was_hit;
 };
 
 void game_init(struct Game *game, int screenWidth, int screenHeight,
