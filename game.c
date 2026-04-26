@@ -3,26 +3,10 @@
 #include "input.h"
 #include "player.h"
 #include "shot.h"
+#include "soundFx.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <stdlib.h>
-
-static const unsigned char SHOOT_WAV[] = {
-#embed "resources/audio/shoot.wav"
-};
-static const unsigned char PLAYER_HIT_WAV[] = {
-#embed "resources/audio/player_hit.wav"
-};
-static const unsigned char ASTEROID_HIT_WAV[] = {
-#embed "resources/audio/asteroid_hit.wav"
-};
-
-static Sound load_embedded_sound(const unsigned char *data, size_t size) {
-	Wave wave = LoadWaveFromMemory(".wav", data, (int)size);
-	Sound sound = LoadSoundFromWave(wave);
-	UnloadWave(wave);
-	return sound;
-}
 
 #define unused [[maybe_unused]]
 
@@ -33,18 +17,15 @@ static Vector2 random_location(Vector2 screen_dimensions) {
 	};
 }
 
-void game_init(struct Game *game, int screenWidth, int screenHeight) {
+void game_init(struct Game *game, int screenWidth, int screenHeight,
+			   struct SoundFx *sfx) {
 	*game = (struct Game){
 		.screen_dimensions =
 			{
 				.x = (float)screenWidth,
 				.y = (float)screenHeight,
 			},
-		.shoot_sound = load_embedded_sound(SHOOT_WAV, sizeof(SHOOT_WAV)),
-		.player_hit_sound =
-			load_embedded_sound(PLAYER_HIT_WAV, sizeof(PLAYER_HIT_WAV)),
-		.asteroid_hit_sound =
-			load_embedded_sound(ASTEROID_HIT_WAV, sizeof(ASTEROID_HIT_WAV)),
+		.sfx = sfx,
 	};
 	player_init(&game->player, game->screen_dimensions);
 	struct Asteroid *last = nullptr;
@@ -69,9 +50,6 @@ void game_destroy(struct Game *game) {
 		cur = cur->next;
 		free(last);
 	}
-	UnloadSound(game->shoot_sound);
-	UnloadSound(game->player_hit_sound);
-	UnloadSound(game->asteroid_hit_sound);
 }
 
 static struct Shot *get_inactive_shot(struct Game *game) {
@@ -91,7 +69,7 @@ static void try_fire_shot(struct Game *game) {
 	}
 	Vector2 startpos = player_cannon_position(&game->player);
 	shot_fire(shot, startpos, game->player.object.rotation);
-	PlaySound(game->shoot_sound);
+	soundFx_play(game->sfx, SFX_SHOOT);
 }
 
 static void update_shots(struct Game *game) {
@@ -153,7 +131,7 @@ static bool collide_asteroid_shots(struct Game *game,
 	// TODO: handle scoring
 	shot_set_active(shot, false);
 	asteroid_stop_moving(asteroid);
-	PlaySound(game->asteroid_hit_sound);
+	soundFx_play(game->sfx, SFX_ASTEROID_HIT);
 	return true;
 }
 
@@ -170,7 +148,7 @@ static void handle_collisions(struct Game *game) {
 			player_hit || player_check_collision(&game->player, asteroid);
 	}
 	if (player_hit && !game->player_was_hit) {
-		PlaySound(game->player_hit_sound);
+		soundFx_play(game->sfx, SFX_PLAYER_HIT);
 	}
 	game->player_was_hit = player_hit;
 	// TODO: handle life tracking

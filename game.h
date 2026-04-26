@@ -7,19 +7,20 @@
 
 constexpr int MAX_NUM_SHOTS = 5;
 
+struct SoundFx;
+
 struct Game {
 	bool isGameOver;
 	struct Player player;
 	struct Asteroid *asteroids;
 	struct Shot shots[MAX_NUM_SHOTS];
 	Vector2 screen_dimensions;
-	Sound shoot_sound;
-	Sound player_hit_sound;
-	Sound asteroid_hit_sound;
+	struct SoundFx *sfx;
 	bool player_was_hit;
 };
 
-void game_init(struct Game *game, int screenWidth, int screenHeight);
+void game_init(struct Game *game, int screenWidth, int screenHeight,
+			   struct SoundFx *sfx);
 void game_destroy(struct Game *game);
 
 void game_update(struct Game *game);
