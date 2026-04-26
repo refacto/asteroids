@@ -147,9 +147,7 @@ static void handle_collisions(struct Game *game) {
 		player_hit =
 			player_hit || player_check_collision(&game->player, asteroid);
 	}
-	if (player_hit && !game->player_was_hit) {
-		soundFx_play(game->sfx, SFX_PLAYER_HIT);
-	}
+	soundFx_play(game->sfx, SFX_PLAYER_HIT);
 	game->player_was_hit = player_hit;
 	// TODO: handle life tracking
 	player_mark_shot(&game->player, player_hit);
