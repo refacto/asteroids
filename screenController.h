@@ -4,6 +4,7 @@ enum ScreenType {
 	SCREEN_TITLE,
 	SCREEN_GAME,
 	SCREEN_SCORE,
+	SCREEN_DESIGN,
 	_SCREEN_MAX, // EOL marker
 };
 
