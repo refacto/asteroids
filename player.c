@@ -2,6 +2,7 @@
 #include "asteroid.h"
 #include "blink.h"
 #include "objects.h"
+#include "screenDimensions.h"
 #include <raylib.h>
 #include <raymath.h>
 #ifdef DEBUG_SHIP
@@ -19,15 +20,17 @@ static void fill_points(Vector2 points[PLAYER_NUM_POINTS]) {
 	points[2] = (Vector2){.x = SHIP_BASE / 2, .y = SHIP_HEIGHT / 2};  // right
 }
 
-void player_init(struct Player *player, Vector2 screen_dimensions) {
+void player_init(struct Player *player) {
+	Vector2 screenDimensions = screenDimensions_get();
+
 	*player = (struct Player){
 		.lives = PLAYER_STARTING_LIVES,
 		.object =
 			{
 				.position =
 					{
-						.x = (float)screen_dimensions.x / 2,
-						.y = (float)screen_dimensions.y / 2,
+						.x = screenDimensions.x / 2,
+						.y = screenDimensions.y / 2,
 					},
 				.max_velocity = 4.0f,
 				.thrust = 0,
@@ -83,7 +86,7 @@ static void update_invincibility(struct Player *player) {
 
 void player_update(struct Player *player) {
 	// FIXME: this should be passed in to update
-	player_move(player, (Vector2){.x = 800, .y = 450});
+	player_move(player);
 	transform_points(player);
 	update_invincibility(player);
 }
@@ -103,9 +106,9 @@ void player_draw(struct Player *player) {
 	DrawTriangleLines(points[0], points[1], points[2], player->object.color);
 }
 
-void player_move(struct Player *player, Vector2 screen_dimensions) {
+void player_move(struct Player *player) {
 	object_move(&player->object);
-	object_wrap_screen(&player->object, screen_dimensions, SHIP_HEIGHT);
+	object_wrap_screen(&player->object, SHIP_HEIGHT);
 }
 
 void player_rotate(struct Player *player, float delta) {

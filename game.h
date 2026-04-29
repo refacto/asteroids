@@ -14,12 +14,10 @@ struct Game {
 	struct Player player;
 	struct Asteroid *asteroids;
 	struct Shot shots[MAX_NUM_SHOTS];
-	Vector2 screen_dimensions;
 	struct SoundFx *sfx;
 };
 
-void game_init(struct Game *game, int screenWidth, int screenHeight,
-			   struct SoundFx *sfx);
+void game_init(struct Game *game, struct SoundFx *sfx);
 void game_destroy(struct Game *game);
 
 void game_update(struct Game *game);

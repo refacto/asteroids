@@ -1,4 +1,5 @@
 #include "objects.h"
+#include "screenDimensions.h"
 #include <raylib.h>
 #include <raymath.h>
 
@@ -14,18 +15,18 @@ void object_move(struct Object *obj) {
 	obj->position = Vector2Add(obj->position, obj->velocity);
 }
 
-void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
-						float wrap_offset) {
+void object_wrap_screen(struct Object *obj, float wrap_offset) {
 	Vector2 newPos = obj->position;
-	if (obj->position.x > screen_dimensions.x + wrap_offset) {
+	Vector2 screenDimensions = screenDimensions_get();
+	if (obj->position.x > screenDimensions.x + wrap_offset) {
 		newPos.x = -wrap_offset;
 	} else if (obj->position.x < 0 - wrap_offset) {
-		newPos.x = screen_dimensions.x + wrap_offset;
+		newPos.x = screenDimensions.x + wrap_offset;
 	}
-	if (obj->position.y > screen_dimensions.y + wrap_offset) {
+	if (obj->position.y > screenDimensions.y + wrap_offset) {
 		newPos.y = -wrap_offset;
 	} else if (obj->position.y < 0 - wrap_offset) {
-		newPos.y = screen_dimensions.y + wrap_offset;
+		newPos.y = screenDimensions.y + wrap_offset;
 	}
 	obj->position = newPos;
 }

@@ -26,8 +26,7 @@ void shot_update(struct Shot *shot) {
 		shot->active = false;
 		return;
 	}
-	// FIXME: this should be passed in to update
-	shot_move(shot, (Vector2){.x = 800, .y = 450});
+	shot_move(shot);
 }
 
 void shot_draw(struct Shot *shot) {
@@ -38,9 +37,9 @@ void shot_draw(struct Shot *shot) {
 			   SHOT_RADIUS, shot->object.color);
 }
 
-void shot_move(struct Shot *shot, Vector2 screen_dimensions) {
+void shot_move(struct Shot *shot) {
 	object_move(&shot->object);
-	object_wrap_screen(&shot->object, screen_dimensions, SHOT_RADIUS * 2);
+	object_wrap_screen(&shot->object, SHOT_RADIUS * 2);
 }
 
 void shot_fire(struct Shot *shot, Vector2 position, float rotation) {

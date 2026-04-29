@@ -17,8 +17,7 @@ void object_move(struct Object *obj);
 
 // wraps an object around the screen.
 // wrap_offset describes the padding that's added to avoid jumping
-void object_wrap_screen(struct Object *obj, Vector2 screen_dimensions,
-						float wrap_offset);
+void object_wrap_screen(struct Object *obj, float wrap_offset);
 
 // transform a given vector into the global coordinate system
 // applying rotation and position offset

@@ -76,6 +76,7 @@ srcs = [
   'player.c',
   'asteroid.c',
   'screenController.c',
+  'screenDimensions.c',
   'shot.c',
   'fontLoader.c',
   'objects.c',

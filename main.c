@@ -2,6 +2,7 @@
 #include "game.h"
 #include "globalActions.h"
 #include "screenController.h"
+#include "screenDimensions.h"
 #include "soundFx.h"
 #include "title.h"
 
@@ -16,14 +17,16 @@ int main(void) {
 	InitAudioDevice();
 	SetTargetFPS(60);
 
+	screenDimensions_set(screenWidth, screenHeight);
+
 	struct FontLoader *fontLoader = &(struct FontLoader){};
 	fontLoader_init(fontLoader);
 	struct SoundFx *sfx = &(struct SoundFx){};
 	soundFx_init(sfx);
 	struct Game *game = &(struct Game){};
-	game_init(game, screenWidth, screenHeight, sfx);
+	game_init(game, sfx);
 	struct Title *title = &(struct Title){};
-	title_init(title, fontLoader, screenWidth, screenHeight);
+	title_init(title, fontLoader);
 
 	struct ScreenController *screenController = &(struct ScreenController){};
 	screen_register(screenController, SCREEN_TITLE,

@@ -2,6 +2,7 @@
 #include "asteroid.h"
 #include "input.h"
 #include "player.h"
+#include "screenDimensions.h"
 #include "shot.h"
 #include "soundFx.h"
 #include <raylib.h>
@@ -10,29 +11,24 @@
 
 #define unused [[maybe_unused]]
 
-static Vector2 random_location(Vector2 screen_dimensions) {
+static Vector2 random_location() {
+	Vector2 screenDimensions = screenDimensions_get();
 	return (Vector2){
-		.x = (float)GetRandomValue(0, (int)screen_dimensions.x),
-		.y = (float)GetRandomValue(0, (int)screen_dimensions.y),
+		.x = (float)GetRandomValue(0, (int)screenDimensions.x),
+		.y = (float)GetRandomValue(0, (int)screenDimensions.y),
 	};
 }
 
-void game_init(struct Game *game, int screenWidth, int screenHeight,
-			   struct SoundFx *sfx) {
+void game_init(struct Game *game, struct SoundFx *sfx) {
 	*game = (struct Game){
-		.screen_dimensions =
-			{
-				.x = (float)screenWidth,
-				.y = (float)screenHeight,
-			},
 		.sfx = sfx,
 	};
-	player_init(&game->player, game->screen_dimensions);
+
+	player_init(&game->player);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
 		struct Asteroid *asteroid = asteroid_new();
-		asteroid_set_position(asteroid,
-							  random_location(game->screen_dimensions));
+		asteroid_set_position(asteroid, random_location());
 		asteroid_set_next(asteroid, last);
 		last = asteroid;
 	}
@@ -81,7 +77,7 @@ static void update_shots(struct Game *game) {
 static void update_asteroids(struct Game *game) {
 	struct Asteroid *asteroid = game->asteroids;
 	while (asteroid) {
-		asteroid_update(asteroid, game->screen_dimensions);
+		asteroid_update(asteroid);
 		asteroid = asteroid->next;
 	}
 }

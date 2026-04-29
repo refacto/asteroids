@@ -1,5 +1,6 @@
 #include "asteroidShower.h"
 #include "asteroid.h"
+#include "screenDimensions.h"
 #include <math.h>
 #include <raylib.h>
 
@@ -7,8 +8,8 @@
 constexpr int ASTEROID_SHOWER_DIR_CENTER = 135;
 constexpr int ASTEROID_SHOWER_DIR_SPREAD = 15;
 
-void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
-	as->screenDimensions = screenDimensions;
+void asteroidShower_init(struct AsteroidShower *as) {
+	Vector2 screenDimensions = screenDimensions_get();
 	int deg =
 		GetRandomValue(ASTEROID_SHOWER_DIR_CENTER - ASTEROID_SHOWER_DIR_SPREAD,
 					   ASTEROID_SHOWER_DIR_CENTER + ASTEROID_SHOWER_DIR_SPREAD);
@@ -42,7 +43,7 @@ void asteroidShower_init(struct AsteroidShower *as, Vector2 screenDimensions) {
 
 void asteroidShower_update(struct AsteroidShower *as) {
 	for (int i = 0; i < ASTEROID_SHOWER_COUNT; i++) {
-		asteroid_update(&as->asteroids[i], as->screenDimensions);
+		asteroid_update(&as->asteroids[i]);
 	}
 }
 

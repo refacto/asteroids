@@ -173,10 +173,10 @@ struct Asteroid *asteroid_split(const struct Asteroid *asteroid,
 	return left;
 }
 
-void asteroid_move(struct Asteroid *asteroid, Vector2 screen_dimensions) {
+void asteroid_move(struct Asteroid *asteroid) {
 	object_move(&asteroid->object);
 	struct AsteroidSpec spec = specs[asteroid->size];
-	object_wrap_screen(&asteroid->object, screen_dimensions, spec.radius);
+	object_wrap_screen(&asteroid->object, spec.radius);
 }
 
 // moves the origin centered shape points to the logical location on screen,
@@ -188,8 +188,8 @@ static void transform_points(struct Asteroid *asteroid) {
 	}
 }
 
-void asteroid_update(struct Asteroid *asteroid, Vector2 screen_dimensions) {
-	asteroid_move(asteroid, screen_dimensions);
+void asteroid_update(struct Asteroid *asteroid) {
+	asteroid_move(asteroid);
 	// cache the transformed points, both drawing and collision need it
 	transform_points(asteroid);
 }

@@ -1,9 +1,7 @@
 #include "title.h"
-#include "fontLoader.h"
 #include "globalActions.h"
 #include "input.h"
-#include "screenController.h"
-#include <raylib.h>
+#include "screenDimensions.h"
 #include <stddef.h>
 
 #define unused [[maybe_unused]]
@@ -47,17 +45,12 @@ static struct MenuOption entries[] = {
 static int selectedEntryIdx = 0;
 constexpr int nEntries = sizeof(entries) / sizeof(*entries);
 
-void title_init(struct Title *title, struct FontLoader *fontLoader,
-				int screenWidth, int screenHeight) {
+void title_init(struct Title *title, struct FontLoader *fontLoader) {
 	*title = (struct Title){
 		.fontLoader = fontLoader,
-		.screenDimensions =
-			{
-				.x = (float)screenWidth,
-				.y = (float)screenHeight,
-			},
 	};
-	asteroidShower_init(&title->asteroidShower, title->screenDimensions);
+
+	asteroidShower_init(&title->asteroidShower);
 }
 
 void title_destroy(unused struct Title *title) {}
@@ -103,13 +96,16 @@ static float drawTextCentered(struct Title *title, enum FontType type,
 	return y + dims.y;
 }
 
-void title_draw(unused struct Title *title) {
+void title_draw(struct Title *title) {
+	Vector2 screenDimensions = screenDimensions_get();
+
 	ClearBackground(BLACK);
 	asteroidShower_draw(&title->asteroidShower);
+
 	char const *titleText = "ASTEROIDS";
 	float y = 20; // padding
-	y = drawTextCentered(title, FONT_TITLE, titleText,
-						 title->screenDimensions.x, y, MAROON);
+	y = drawTextCentered(title, FONT_TITLE, titleText, screenDimensions.x, y,
+						 MAROON);
 
 	y += 100; // padding logo
 	for (int i = 0; i < nEntries; i++) {
@@ -120,7 +116,7 @@ void title_draw(unused struct Title *title) {
 			color = RAYWHITE;
 		}
 		y = drawTextCentered(title, FONT_NORMAL, entries[i].text,
-							 title->screenDimensions.x, y, color);
+							 screenDimensions.x, y, color);
 		y += 10; // padding entries
 	}
 }
