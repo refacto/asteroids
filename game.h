@@ -3,11 +3,10 @@
 #include "player.h"
 #include "screenController.h"
 #include "shot.h"
+#include "soundFx.h"
 #include <raylib.h>
 
 constexpr int MAX_NUM_SHOTS = 5;
-
-struct SoundFx;
 
 struct Game {
 	bool isGameOver;
