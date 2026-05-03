@@ -21,7 +21,7 @@ jobs:
           echo "CLANG_FORMAT=$CLANG_FORMAT" >> $GITHUB_ENV
 
       - name: Check formatting
-        run: $CLANG_FORMAT --dry-run --Werror main.c
+        run: find -name "*.[ch]" -print0 | xargs -n1 -r -0 "$CLANG_FORMAT" --dry-run -Werror
 
   build:
     strategy:
