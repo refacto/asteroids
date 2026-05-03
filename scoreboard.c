@@ -3,6 +3,26 @@
 #include "screenDimensions.h"
 #include <raylib.h>
 #include <stdio.h>
+#include <string.h>
+
+static const char *SCOREBOARD_FILE = "scores.dat";
+
+static void scoreboard_save(const struct Scoreboard *scoreboard) {
+	SaveFileData(SCOREBOARD_FILE, (void *)scoreboard->entries,
+				 sizeof(scoreboard->entries));
+}
+
+static void scoreboard_load(struct Scoreboard *scoreboard) {
+	if (!FileExists(SCOREBOARD_FILE))
+		return;
+
+	int dataSize = 0;
+	unsigned char *data = LoadFileData(SCOREBOARD_FILE, &dataSize);
+	if (data && (size_t)dataSize == sizeof(scoreboard->entries))
+		memcpy(scoreboard->entries, data, sizeof(scoreboard->entries));
+
+	UnloadFileData(data);
+}
 
 void scoreboard_init(struct Scoreboard *scoreboard,
 					 struct FontLoader *fontLoader,
@@ -11,6 +31,7 @@ void scoreboard_init(struct Scoreboard *scoreboard,
 		.fontLoader = fontLoader,
 		.asteroidShower = asteroidShower,
 	};
+	scoreboard_load(scoreboard);
 }
 
 void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
@@ -25,6 +46,7 @@ void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
 					 sizeof(scoreboard->entries[i].name), "%.*s",
 					 SCOREBOARD_NAME_LEN, name);
 			scoreboard->entries[i].score = score;
+			scoreboard_save(scoreboard);
 			return;
 		}
 	}
