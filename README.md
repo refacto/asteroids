@@ -56,12 +56,12 @@ The project uses [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to
 
 To format all C files:
 ```sh
-clang-format -i main.c
+clang-format -i *.c *.h
 ```
 
 To check formatting without modifying files (as CI does):
 ```sh
-clang-format --dry-run --Werror main.c
+clang-format --dry-run --Werror *.c *.h
 ```
 
 ### Git hook
