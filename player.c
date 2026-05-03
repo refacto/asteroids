@@ -44,13 +44,14 @@ void player_init(struct Player *player) {
 
 #ifdef DEBUG_SHIP
 static void render_debug(struct Player *player) {
-	// debug stuff
+	Vector2 screenDimensions = screenDimensions_get();
 	char buf[BUFSIZ];
 	float speed = Vector2Length(player->object.velocity);
 	snprintf(buf, sizeof(buf), "thrust=%f\nspeed=%f", player->object.thrust,
 			 speed);
-	DrawText(buf, 0, 0, 12, WHITE);
-	DrawFPS(600, 0);
+	int yOffset = (int)screenDimensions.y - 40;
+	DrawText(buf, 10, yOffset, 12, WHITE);
+	DrawFPS((int)screenDimensions.x - 100, yOffset);
 };
 #endif
 

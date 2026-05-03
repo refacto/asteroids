@@ -1,5 +1,6 @@
 #include "game.h"
 #include "asteroid.h"
+#include "healthBar.h"
 #include "input.h"
 #include "player.h"
 #include "screenDimensions.h"
@@ -37,6 +38,8 @@ void game_init(struct Game *game, struct SoundFx *sfx) {
 	};
 
 	player_init(&game->player);
+	healthBar_init(&game->healthBar, (Vector2){.x = 20, .y = 20},
+				   game->player.lives);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
 		struct Asteroid *asteroid = new_safe_asteroid();
@@ -176,6 +179,7 @@ void game_update(struct Game *game) {
 	player_update(&game->player);
 	update_shots(game);
 	handle_collisions(game);
+	healthBar_set_num_lifes(&game->healthBar, game->player.lives);
 	handle_input(game);
 }
 
@@ -194,6 +198,7 @@ void game_draw(struct Game *game) {
 	}
 	draw_shots(game);
 	player_draw(&game->player);
+	healthBar_draw(&game->healthBar);
 }
 
 void game_screen_update(unused struct ScreenController *ctrl, void *data) {
