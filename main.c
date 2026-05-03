@@ -24,7 +24,7 @@ int main(void) {
 	struct SoundFx *sfx = &(struct SoundFx){};
 	soundFx_init(sfx);
 	struct Game *game = &(struct Game){};
-	game_init(game, sfx);
+	game_init(game, sfx, fontLoader);
 	struct Title *title = &(struct Title){};
 	title_init(title, fontLoader);
 
