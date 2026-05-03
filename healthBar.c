@@ -16,10 +16,17 @@ static void init_hearts(struct HealthBar *bar) {
 	}
 }
 
-void healthBar_init(struct HealthBar *bar, Vector2 position, int numLives) {
+static int force_range_numLives(int numLives) {
 	if (numLives > MAX_LIVES) {
 		numLives = MAX_LIVES;
+	} else if (numLives < 0) {
+		numLives = 0;
 	}
+	return numLives;
+}
+
+void healthBar_init(struct HealthBar *bar, Vector2 position, int numLives) {
+	numLives = force_range_numLives(numLives);
 	*bar = (struct HealthBar){
 		.numLives = numLives,
 		.position = position,
@@ -28,7 +35,7 @@ void healthBar_init(struct HealthBar *bar, Vector2 position, int numLives) {
 }
 
 void healthBar_set_num_lifes(struct HealthBar *bar, int numLives) {
-	bar->numLives = numLives;
+	bar->numLives = force_range_numLives(numLives);
 }
 
 void healthBar_draw(struct HealthBar *bar) {
