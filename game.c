@@ -11,12 +11,24 @@
 
 #define unused [[maybe_unused]]
 
-static Vector2 random_location() {
+constexpr float SAFE_SPAWN_RADIUS = 100;
+
+static struct Asteroid *new_safe_asteroid() {
+	struct Asteroid *asteroid = asteroid_new();
+	// somewhat unclean, but we know that the player spawns in the center.
+	// so give the player some space
 	Vector2 screenDimensions = screenDimensions_get();
-	return (Vector2){
-		.x = (float)GetRandomValue(0, (int)screenDimensions.x),
-		.y = (float)GetRandomValue(0, (int)screenDimensions.y),
-	};
+	Vector2 screenCenter = Vector2Scale(screenDimensions, 0.5);
+	Vector2 position;
+	do {
+		position = (Vector2){
+			.x = (float)GetRandomValue(0, (int)screenDimensions.x),
+			.y = (float)GetRandomValue(0, (int)screenDimensions.y),
+		};
+		asteroid_set_position(asteroid, position);
+	} while (asteroid_collide_circle_coarse(asteroid, screenCenter,
+											SAFE_SPAWN_RADIUS));
+	return asteroid;
 }
 
 void game_init(struct Game *game, struct SoundFx *sfx) {
@@ -27,8 +39,7 @@ void game_init(struct Game *game, struct SoundFx *sfx) {
 	player_init(&game->player);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
-		struct Asteroid *asteroid = asteroid_new();
-		asteroid_set_position(asteroid, random_location());
+		struct Asteroid *asteroid = new_safe_asteroid();
 		asteroid_set_next(asteroid, last);
 		last = asteroid;
 	}
