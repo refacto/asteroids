@@ -3,6 +3,7 @@
 #include "healthBar.h"
 #include "input.h"
 #include "player.h"
+#include "score.h"
 #include "screenDimensions.h"
 #include "shot.h"
 #include "soundFx.h"
@@ -14,6 +15,8 @@
 
 constexpr float SAFE_SPAWN_RADIUS = 100;
 constexpr int ASTEROID_SPAWN_NUM = 10;
+constexpr int POINTS_PER_NO_HIT_INTERVAL = 50;
+constexpr float NO_HIT_INTERVAL = 10.0f;
 
 enum SpawnDirection {
 	UP = 0,
@@ -40,11 +43,13 @@ static struct Asteroid *new_safe_asteroid() {
 	return asteroid;
 }
 
-void game_init(struct Game *game, struct SoundFx *sfx) {
+void game_init(struct Game *game, struct SoundFx *sfx,
+			   struct FontLoader *fontLoader) {
 	*game = (struct Game){
 		.sfx = sfx,
 	};
 
+	score_init(&game->score, fontLoader);
 	player_init(&game->player);
 	healthBar_init(&game->healthBar, (Vector2){.x = 20, .y = 20},
 				   game->player.lives);
@@ -146,7 +151,7 @@ static bool collide_asteroid_shots(struct Game *game,
 	if (!shot) {
 		return false;
 	}
-	// TODO: handle scoring
+	score_add(&game->score, asteroid_score_value(asteroid));
 	Vector2 damageDirection = shot->object.velocity;
 	shot_set_active(shot, false);
 	if (asteroid_can_split(asteroid)) {
@@ -178,6 +183,7 @@ static void handle_collisions(struct Game *game) {
 	if (player_hit) {
 		soundFx_play(game->sfx, SFX_PLAYER_HIT);
 		player_set_invincible(&game->player);
+		game->noHitTimer = 0;
 	}
 	player_mark_shot(&game->player, player_hit);
 }
@@ -227,6 +233,14 @@ static void respawn_enemies(struct Game *game) {
 	game->asteroids = asteroids;
 }
 
+static void update_no_hit_bonus(struct Game *game) {
+	game->noHitTimer += GetFrameTime();
+	if (game->noHitTimer > NO_HIT_INTERVAL) {
+		game->noHitTimer = 0.0f;
+		score_add(&game->score, POINTS_PER_NO_HIT_INTERVAL);
+	}
+}
+
 void game_update(struct Game *game) {
 	respawn_enemies(game);
 	update_asteroids(game);
@@ -235,6 +249,7 @@ void game_update(struct Game *game) {
 	handle_collisions(game);
 	healthBar_set_num_lifes(&game->healthBar, game->player.lives);
 	handle_input(game);
+	update_no_hit_bonus(game);
 }
 
 static void draw_shots(struct Game *game) {
@@ -253,6 +268,7 @@ void game_draw(struct Game *game) {
 	draw_shots(game);
 	player_draw(&game->player);
 	healthBar_draw(&game->healthBar);
+	score_draw(&game->score);
 }
 
 void game_screen_update(unused struct ScreenController *ctrl, void *data) {

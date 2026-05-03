@@ -54,6 +54,9 @@ void asteroid_set_position(struct Asteroid *asteroid, Vector2 position);
 // returns the radius used for screen wrap around
 float asteroid_get_wrap_offset(const struct Asteroid *asteroid);
 
+// returns the score awarded for destroying this asteroid
+int asteroid_score_value(const struct Asteroid *asteroid);
+
 // returns true if an asteroid can be split into smaller versions
 bool asteroid_can_split(const struct Asteroid *asteroid);
 

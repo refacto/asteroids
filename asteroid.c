@@ -1,6 +1,7 @@
 #include "asteroid.h"
 #include "malloc.h"
 #include "objects.h"
+#include <assert.h>
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
@@ -145,6 +146,20 @@ void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
 float asteroid_get_wrap_offset(const struct Asteroid *asteroid) {
 	struct AsteroidSpec spec = specs[asteroid->size];
 	return spec.radius;
+}
+
+int asteroid_score_value(const struct Asteroid *asteroid) {
+	switch (asteroid->size) {
+		case SIZE_SMALL:
+			return 100;
+		case SIZE_MEDIUM:
+			return 50;
+		case SIZE_LARGE:
+			return 20;
+		default:
+			assert(false && "unknown asteroid size");
+			return 0;
+	}
 }
 
 bool asteroid_can_split(const struct Asteroid *asteroid) {

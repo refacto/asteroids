@@ -1,7 +1,9 @@
 #pragma once
 #include "asteroid.h"
+#include "fontLoader.h"
 #include "healthBar.h"
 #include "player.h"
+#include "score.h"
 #include "screenController.h"
 #include "shot.h"
 #include "soundFx.h"
@@ -16,9 +18,12 @@ struct Game {
 	struct Shot shots[MAX_NUM_SHOTS];
 	struct HealthBar healthBar;
 	struct SoundFx *sfx;
+	struct Score score;
+	float noHitTimer;
 };
 
-void game_init(struct Game *game, struct SoundFx *sfx);
+void game_init(struct Game *game, struct SoundFx *sfx,
+			   struct FontLoader *fontLoader);
 void game_destroy(struct Game *game);
 
 void game_update(struct Game *game);
