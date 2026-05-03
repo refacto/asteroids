@@ -17,9 +17,8 @@ static void onSelectPlay(unused struct Title *title,
 }
 
 static void onSelectScore(unused struct Title *title,
-						  unused struct ScreenController *ctrl) {
-	// TODO
-	// screen_transition(ctrl, SCREEN_SCORE);
+						  struct ScreenController *ctrl) {
+	screen_transition(ctrl, SCREEN_SCORE);
 }
 
 static void onSelectQuit(unused struct Title *title,
@@ -45,12 +44,12 @@ static struct MenuOption entries[] = {
 static int selectedEntryIdx = 0;
 constexpr int nEntries = sizeof(entries) / sizeof(*entries);
 
-void title_init(struct Title *title, struct FontLoader *fontLoader) {
+void title_init(struct Title *title, struct FontLoader *fontLoader,
+				struct AsteroidShower *asteroidShower) {
 	*title = (struct Title){
 		.fontLoader = fontLoader,
+		.asteroidShower = asteroidShower,
 	};
-
-	asteroidShower_init(&title->asteroidShower);
 }
 
 void title_destroy(unused struct Title *title) {}
@@ -65,7 +64,7 @@ static void inc_selected(int delta) {
 }
 
 void title_update(unused struct Title *title, struct ScreenController *ctrl) {
-	asteroidShower_update(&title->asteroidShower);
+	asteroidShower_update(title->asteroidShower);
 	if (input_key_once(ACTION_DOWN)) {
 		inc_selected(1);
 	}
@@ -100,7 +99,7 @@ void title_draw(struct Title *title) {
 	Vector2 screenDimensions = screenDimensions_get();
 
 	ClearBackground(BLACK);
-	asteroidShower_draw(&title->asteroidShower);
+	asteroidShower_draw(title->asteroidShower);
 
 	char const *titleText = "ASTEROIDS";
 	float y = 20; // padding
