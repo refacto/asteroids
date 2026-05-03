@@ -1,6 +1,8 @@
+#include "asteroidShower.h"
 #include "fontLoader.h"
 #include "game.h"
 #include "globalActions.h"
+#include "scoreboard.h"
 #include "screenController.h"
 #include "screenDimensions.h"
 #include "soundFx.h"
@@ -24,9 +26,13 @@ int main(void) {
 	struct SoundFx *sfx = &(struct SoundFx){};
 	soundFx_init(sfx);
 	struct Game *game = &(struct Game){};
-	game_init(game, sfx);
+	game_init(game, sfx, fontLoader);
+	struct AsteroidShower *asteroidShower = &(struct AsteroidShower){};
+	asteroidShower_init(asteroidShower);
 	struct Title *title = &(struct Title){};
-	title_init(title, fontLoader);
+	title_init(title, fontLoader, asteroidShower);
+	struct Scoreboard *scoreboard = &(struct Scoreboard){};
+	scoreboard_init(scoreboard, fontLoader, asteroidShower);
 
 	struct ScreenController *screenController = &(struct ScreenController){};
 	screen_register(screenController, SCREEN_TITLE,
@@ -40,6 +46,12 @@ int main(void) {
 						.draw = game_screen_draw,
 						.update = game_screen_update,
 						.data = game,
+					});
+	screen_register(screenController, SCREEN_SCORE,
+					&(struct Screen){
+						.draw = scoreboard_screen_draw,
+						.update = scoreboard_screen_update,
+						.data = scoreboard,
 					});
 	screen_set_active(screenController, SCREEN_TITLE);
 

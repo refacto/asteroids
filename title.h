@@ -8,10 +8,11 @@
 struct Title {
 	bool isGameOver;
 	struct FontLoader *fontLoader;
-	struct AsteroidShower asteroidShower;
+	struct AsteroidShower *asteroidShower;
 };
 
-void title_init(struct Title *title, struct FontLoader *fontLoader);
+void title_init(struct Title *title, struct FontLoader *fontLoader,
+				struct AsteroidShower *asteroidShower);
 void title_destroy(struct Title *title);
 
 void title_update(struct Title *title, struct ScreenController *ctrl);

@@ -2,6 +2,7 @@
 #include "asteroid.h"
 #include "input.h"
 #include "player.h"
+#include "score.h"
 #include "screenDimensions.h"
 #include "shot.h"
 #include "soundFx.h"
@@ -19,11 +20,13 @@ static Vector2 random_location() {
 	};
 }
 
-void game_init(struct Game *game, struct SoundFx *sfx) {
+void game_init(struct Game *game, struct SoundFx *sfx,
+			   struct FontLoader *fontLoader) {
 	*game = (struct Game){
 		.sfx = sfx,
 	};
 
+	score_init(&game->score, fontLoader);
 	player_init(&game->player);
 	struct Asteroid *last = nullptr;
 	for (int i = 0; i < 10; i++) {
@@ -124,7 +127,7 @@ static bool collide_asteroid_shots(struct Game *game,
 	if (!shot) {
 		return false;
 	}
-	// TODO: handle scoring
+	score_award_asteroid_hit(&game->score);
 	Vector2 damageDirection = shot->object.velocity;
 	shot_set_active(shot, false);
 	if (asteroid_can_split(asteroid)) {
@@ -156,6 +159,7 @@ static void handle_collisions(struct Game *game) {
 	if (player_hit) {
 		soundFx_play(game->sfx, SFX_PLAYER_HIT);
 		player_set_invincible(&game->player);
+		score_player_hit(&game->score);
 	}
 	player_mark_shot(&game->player, player_hit);
 }
@@ -166,6 +170,7 @@ void game_update(struct Game *game) {
 	update_shots(game);
 	handle_collisions(game);
 	handle_input(game);
+	score_update(&game->score);
 }
 
 static void draw_shots(struct Game *game) {
@@ -183,6 +188,7 @@ void game_draw(struct Game *game) {
 	}
 	draw_shots(game);
 	player_draw(&game->player);
+	score_draw(&game->score);
 }
 
 void game_screen_update(unused struct ScreenController *ctrl, void *data) {
