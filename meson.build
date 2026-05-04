@@ -13,8 +13,8 @@ project(
 )
 cc = meson.get_compiler('c')
 
-# sanitizers are not supported on Windows; leak sanitizer is Linux-only
-if host_machine.system() != 'windows'
+# sanitizers are not supported on Windows or Emscripten; leak sanitizer is Linux-only
+if host_machine.system() != 'windows' and host_machine.system() != 'emscripten'
   sanitize_flags = ['-fsanitize=address,undefined']
   if host_machine.system() != 'darwin'
     sanitize_flags += ['-fsanitize=leak']
@@ -87,4 +87,23 @@ srcs = [
   'globalActions.c',
   'soundFx.c',
 ]
-executable('asteroids', srcs, install: true, dependencies: [raylib])
+
+if host_machine.system() == 'emscripten'
+  web_link_args = [
+    '-sUSE_GLFW=3',
+    '-sASYNCIFY',
+    '-sTOTAL_MEMORY=64MB',
+    '-sFORCE_FILESYSTEM=1',
+    '-O3',
+  ]
+
+  executable(
+    'asteroids',
+    srcs,
+    dependencies: [raylib],
+    link_args: web_link_args,
+    name_suffix: 'html',
+  )
+else
+  executable('asteroids', srcs, install: true, dependencies: [raylib])
+endif

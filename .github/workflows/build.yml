@@ -77,3 +77,78 @@ jobs:
         run: |
           meson setup build
           meson compile -C build
+
+  web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64
+          actions-cache-folder: emsdk-cache
+
+      - name: Install meson + ninja
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build cmake
+          pip install meson
+
+      - name: Cache raylib (web)
+        id: cache-raylib-web
+        uses: actions/cache@v4
+        with:
+          path: /tmp/raylib-web
+          key: raylib-5.5-web-emsdk3.1.64
+
+      - name: Build raylib for web (cache miss)
+        if: steps.cache-raylib-web.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          emcmake cmake -S /tmp/raylib -B /tmp/raylib/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DPLATFORM=Web \
+            -DCMAKE_INSTALL_PREFIX=/tmp/raylib-web
+          cmake --build /tmp/raylib/build --parallel
+          cmake --install /tmp/raylib/build
+
+      - name: Build asteroids (web)
+        run: |
+          export PKG_CONFIG_PATH=/tmp/raylib-web/lib/pkgconfig
+          meson setup build-web --cross-file cross/emscripten.ini --buildtype release
+          meson compile -C build-web
+
+      - name: Stage Pages bundle
+        run: |
+          mkdir -p _site
+          cp build-web/asteroids.html _site/index.html
+          cp build-web/asteroids.js _site/
+          cp build-web/asteroids.wasm _site/
+          if [ -f build-web/asteroids.data ]; then
+            cp build-web/asteroids.data _site/
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy-pages:
+    needs: web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
