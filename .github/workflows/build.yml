@@ -120,13 +120,35 @@ jobs:
           meson setup build-web --cross-file cross/emscripten.ini --buildtype release
           meson compile -C build-web
 
-      - name: Upload web artifact
-        uses: actions/upload-artifact@v4
+      - name: Stage Pages bundle
+        run: |
+          mkdir -p _site
+          cp build-web/asteroids.html _site/index.html
+          cp build-web/asteroids.js _site/
+          cp build-web/asteroids.wasm _site/
+          if [ -f build-web/asteroids.data ]; then
+            cp build-web/asteroids.data _site/
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: asteroids-web
-          path: |
-            build-web/asteroids.html
-            build-web/asteroids.js
-            build-web/asteroids.wasm
-            build-web/asteroids.data
-          if-no-files-found: ignore
+          path: _site
+
+  deploy-pages:
+    needs: web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
