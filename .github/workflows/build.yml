@@ -50,9 +50,31 @@ jobs:
             libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev \
             libxinerama-dev libwayland-dev libxkbcommon-dev
           pip install meson
+
+      - name: Cache raylib (Linux)
+        if: runner.os == 'Linux'
+        id: cache-raylib
+        uses: actions/cache@v4
+        with:
+          path: /tmp/raylib-install
+          key: raylib-5.5-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build raylib (Linux, cache miss)
+        if: runner.os == 'Linux' && steps.cache-raylib.outputs.cache-hit != 'true'
+        run: |
           git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
-          cmake -S /tmp/raylib -B /tmp/raylib/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-          sudo cmake --build /tmp/raylib/build --target install
+          cmake -S /tmp/raylib -B /tmp/raylib/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCMAKE_INSTALL_PREFIX=/tmp/raylib-install
+          cmake --build /tmp/raylib/build --parallel
+          cmake --install /tmp/raylib/build
+
+      - name: Expose raylib to pkg-config (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "PKG_CONFIG_PATH=/tmp/raylib-install/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=/tmp/raylib-install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
