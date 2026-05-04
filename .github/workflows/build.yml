@@ -101,7 +101,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/raylib-web
-          key: raylib-5.5-web-${{ hashFiles('.github/workflows/build.yml') }}
+          key: raylib-5.5-web-emsdk3.1.64
 
       - name: Build raylib for web (cache miss)
         if: steps.cache-raylib-web.outputs.cache-hit != 'true'
