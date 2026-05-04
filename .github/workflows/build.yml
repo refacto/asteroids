@@ -77,3 +77,56 @@ jobs:
         run: |
           meson setup build
           meson compile -C build
+
+  web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64
+          actions-cache-folder: emsdk-cache
+
+      - name: Install meson + ninja
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build cmake
+          pip install meson
+
+      - name: Cache raylib (web)
+        id: cache-raylib-web
+        uses: actions/cache@v4
+        with:
+          path: /tmp/raylib-web
+          key: raylib-5.5-web-${{ hashFiles('.github/workflows/build.yml') }}
+
+      - name: Build raylib for web (cache miss)
+        if: steps.cache-raylib-web.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          emcmake cmake -S /tmp/raylib -B /tmp/raylib/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DPLATFORM=Web \
+            -DCMAKE_INSTALL_PREFIX=/tmp/raylib-web
+          cmake --build /tmp/raylib/build --parallel
+          cmake --install /tmp/raylib/build
+
+      - name: Build asteroids (web)
+        run: |
+          export PKG_CONFIG_PATH=/tmp/raylib-web/lib/pkgconfig
+          meson setup build-web --cross-file cross/emscripten.ini --buildtype release
+          meson compile -C build-web
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asteroids-web
+          path: |
+            build-web/asteroids.html
+            build-web/asteroids.js
+            build-web/asteroids.wasm
+            build-web/asteroids.data
+          if-no-files-found: ignore
