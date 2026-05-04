@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/raylib-install
-          key: raylib-5.5-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.github/workflows/build.yml') }}
+          key: raylib-5.5-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build raylib (Linux, cache miss)
         if: runner.os == 'Linux' && steps.cache-raylib.outputs.cache-hit != 'true'
