@@ -142,6 +142,11 @@ void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
 	asteroid->object.position = position;
 }
 
+float asteroid_get_wrap_offset(const struct Asteroid *asteroid) {
+	struct AsteroidSpec spec = specs[asteroid->size];
+	return spec.radius;
+}
+
 bool asteroid_can_split(const struct Asteroid *asteroid) {
 	return asteroid->size > SIZE_SMALL;
 }
@@ -174,8 +179,7 @@ struct Asteroid *asteroid_split(const struct Asteroid *asteroid,
 
 void asteroid_move(struct Asteroid *asteroid) {
 	object_move(&asteroid->object);
-	struct AsteroidSpec spec = specs[asteroid->size];
-	object_wrap_screen(&asteroid->object, spec.radius);
+	object_wrap_screen(&asteroid->object, asteroid_get_wrap_offset(asteroid));
 }
 
 // moves the origin centered shape points to the logical location on screen,

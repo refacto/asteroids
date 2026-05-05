@@ -13,6 +13,14 @@
 #define unused [[maybe_unused]]
 
 constexpr float SAFE_SPAWN_RADIUS = 100;
+constexpr int ASTEROID_SPAWN_NUM = 10;
+
+enum SpawnDirection {
+	UP = 0,
+	LEFT = 1,
+	DOWN = 2,
+	RIGHT = 3,
+};
 
 static struct Asteroid *new_safe_asteroid() {
 	struct Asteroid *asteroid = asteroid_new();
@@ -41,7 +49,7 @@ void game_init(struct Game *game, struct SoundFx *sfx) {
 	healthBar_init(&game->healthBar, (Vector2){.x = 20, .y = 20},
 				   game->player.lives);
 	struct Asteroid *last = nullptr;
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < ASTEROID_SPAWN_NUM; i++) {
 		struct Asteroid *asteroid = new_safe_asteroid();
 		asteroid_set_next(asteroid, last);
 		last = asteroid;
@@ -174,7 +182,53 @@ static void handle_collisions(struct Game *game) {
 	player_mark_shot(&game->player, player_hit);
 }
 
+// returns a position that makes an object out of bounds
+static Vector2 random_offbounds_position(float wrap_offset) {
+	Vector2 screenDimensions = screenDimensions_get();
+	enum SpawnDirection direction = (enum SpawnDirection)GetRandomValue(0, 3);
+	Vector2 ret = {};
+	switch (direction) {
+		case UP: {
+			ret.x = (float)GetRandomValue(0, (int)screenDimensions.x);
+			ret.y = -wrap_offset;
+			break;
+		}
+		case DOWN: {
+			ret.x = (float)GetRandomValue(0, (int)screenDimensions.x);
+			ret.y = (float)(int)screenDimensions.y + wrap_offset;
+			break;
+		}
+		case LEFT: {
+			ret.x = -wrap_offset;
+			ret.y = (float)GetRandomValue(0, (int)screenDimensions.y);
+			break;
+		}
+		case RIGHT:
+			ret.x = (float)(int)screenDimensions.x + wrap_offset;
+			ret.y = (float)GetRandomValue(0, (int)screenDimensions.y);
+			break;
+	}
+	return ret;
+}
+
+static void respawn_enemies(struct Game *game) {
+	if (game->asteroids) {
+		return; // there's enemies left
+	}
+	struct Asteroid *asteroids = nullptr;
+	for (int i = 0; i < ASTEROID_SPAWN_NUM; i++) {
+		struct Asteroid *asteroid = asteroid_new();
+		float wrap_offset = asteroid_get_wrap_offset(asteroid);
+		Vector2 position = random_offbounds_position(wrap_offset);
+		asteroid_set_position(asteroid, position);
+		asteroid_set_next(asteroid, asteroids);
+		asteroids = asteroid;
+	}
+	game->asteroids = asteroids;
+}
+
 void game_update(struct Game *game) {
+	respawn_enemies(game);
 	update_asteroids(game);
 	player_update(&game->player);
 	update_shots(game);
