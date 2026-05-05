@@ -5,7 +5,6 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 struct AsteroidSpec {
 	int numPoints;
