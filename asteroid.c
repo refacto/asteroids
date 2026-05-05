@@ -236,9 +236,3 @@ bool asteroid_collide_asteroid(struct Asteroid *self, struct Asteroid *other) {
 	return CheckCollisionCircles(self->object.position, selfSpec.radius,
 								 other->object.position, otherSpec.radius);
 }
-
-// TODO: remove, just here for demo
-void asteroid_stop_moving(struct Asteroid *asteroid) {
-	asteroid->object.velocity = Vector2Zero();
-	asteroid->object.thrust = 0;
-}

@@ -74,6 +74,3 @@ bool asteroid_collide_point(struct Asteroid *asteroid, Vector2 point);
 
 // collision between two asteroids
 bool asteroid_collide_asteroid(struct Asteroid *self, struct Asteroid *other);
-
-// TODO: remove, just here for demo
-void asteroid_stop_moving(struct Asteroid *asteroid);
