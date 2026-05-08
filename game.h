@@ -19,6 +19,7 @@ struct Game {
 	struct HealthBar healthBar;
 	struct SoundFx *sfx;
 	struct Score score;
+	float noHitTimer;
 };
 
 void game_init(struct Game *game, struct SoundFx *sfx,

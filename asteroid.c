@@ -147,6 +147,19 @@ float asteroid_get_wrap_offset(const struct Asteroid *asteroid) {
 	return spec.radius;
 }
 
+int asteroid_score_value(const struct Asteroid *asteroid) {
+	switch (asteroid->size) {
+		case SIZE_SMALL:
+			return 100;
+		case SIZE_MEDIUM:
+			return 50;
+		case SIZE_LARGE:
+			return 20;
+		default: // shouldn't be reached
+			return 0;
+	}
+}
+
 bool asteroid_can_split(const struct Asteroid *asteroid) {
 	return asteroid->size > SIZE_SMALL;
 }

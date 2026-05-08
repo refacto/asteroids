@@ -15,6 +15,8 @@
 
 constexpr float SAFE_SPAWN_RADIUS = 100;
 constexpr int ASTEROID_SPAWN_NUM = 10;
+constexpr int POINTS_PER_NO_HIT_INTERVAL = 50;
+constexpr float NO_HIT_INTERVAL = 10.0f;
 
 enum SpawnDirection {
 	UP = 0,
@@ -149,7 +151,7 @@ static bool collide_asteroid_shots(struct Game *game,
 	if (!shot) {
 		return false;
 	}
-	score_award_asteroid_hit(&game->score);
+	score_add(&game->score, asteroid_score_value(asteroid));
 	Vector2 damageDirection = shot->object.velocity;
 	shot_set_active(shot, false);
 	if (asteroid_can_split(asteroid)) {
@@ -181,7 +183,7 @@ static void handle_collisions(struct Game *game) {
 	if (player_hit) {
 		soundFx_play(game->sfx, SFX_PLAYER_HIT);
 		player_set_invincible(&game->player);
-		score_player_hit(&game->score);
+		game->noHitTimer = 0;
 	}
 	player_mark_shot(&game->player, player_hit);
 }
@@ -231,6 +233,14 @@ static void respawn_enemies(struct Game *game) {
 	game->asteroids = asteroids;
 }
 
+static void update_no_hit_bonus(struct Game *game) {
+	game->noHitTimer += GetFrameTime();
+	if (game->noHitTimer > NO_HIT_INTERVAL) {
+		game->noHitTimer = 0.0f;
+		score_add(&game->score, POINTS_PER_NO_HIT_INTERVAL);
+	}
+}
+
 void game_update(struct Game *game) {
 	respawn_enemies(game);
 	update_asteroids(game);
@@ -239,7 +249,7 @@ void game_update(struct Game *game) {
 	handle_collisions(game);
 	healthBar_set_num_lifes(&game->healthBar, game->player.lives);
 	handle_input(game);
-	score_update(&game->score);
+	update_no_hit_bonus(game);
 }
 
 static void draw_shots(struct Game *game) {
