@@ -5,7 +5,6 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 struct AsteroidSpec {
 	int numPoints;
@@ -143,6 +142,11 @@ void asteroid_set_position(struct Asteroid *asteroid, Vector2 position) {
 	asteroid->object.position = position;
 }
 
+float asteroid_get_wrap_offset(const struct Asteroid *asteroid) {
+	struct AsteroidSpec spec = specs[asteroid->size];
+	return spec.radius;
+}
+
 bool asteroid_can_split(const struct Asteroid *asteroid) {
 	return asteroid->size > SIZE_SMALL;
 }
@@ -175,8 +179,7 @@ struct Asteroid *asteroid_split(const struct Asteroid *asteroid,
 
 void asteroid_move(struct Asteroid *asteroid) {
 	object_move(&asteroid->object);
-	struct AsteroidSpec spec = specs[asteroid->size];
-	object_wrap_screen(&asteroid->object, spec.radius);
+	object_wrap_screen(&asteroid->object, asteroid_get_wrap_offset(asteroid));
 }
 
 // moves the origin centered shape points to the logical location on screen,
@@ -236,10 +239,4 @@ bool asteroid_collide_asteroid(struct Asteroid *self, struct Asteroid *other) {
 	struct AsteroidSpec otherSpec = specs[other->size];
 	return CheckCollisionCircles(self->object.position, selfSpec.radius,
 								 other->object.position, otherSpec.radius);
-}
-
-// TODO: remove, just here for demo
-void asteroid_stop_moving(struct Asteroid *asteroid) {
-	asteroid->object.velocity = Vector2Zero();
-	asteroid->object.thrust = 0;
 }
