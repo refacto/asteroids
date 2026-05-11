@@ -20,6 +20,9 @@ static void scoreboard_load(struct Scoreboard *scoreboard) {
 	unsigned char *data = LoadFileData(SCOREBOARD_FILE, &dataSize);
 	if (data && (size_t)dataSize == sizeof(scoreboard->entries))
 		memcpy(scoreboard->entries, data, sizeof(scoreboard->entries));
+	else if (data)
+		fprintf(stderr, "scoreboard: %s size mismatch (got %d, expected %zu)\n",
+				SCOREBOARD_FILE, dataSize, sizeof(scoreboard->entries));
 
 	UnloadFileData(data);
 }
