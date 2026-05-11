@@ -1,6 +1,7 @@
 #include "asteroid.h"
 #include "malloc.h"
 #include "objects.h"
+#include <assert.h>
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
@@ -155,7 +156,8 @@ int asteroid_score_value(const struct Asteroid *asteroid) {
 			return 50;
 		case SIZE_LARGE:
 			return 20;
-		default: // shouldn't be reached
+		default:
+			assert(false && "unknown asteroid size");
 			return 0;
 	}
 }
