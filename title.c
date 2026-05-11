@@ -1,4 +1,5 @@
 #include "title.h"
+#include "drawHelpers.h"
 #include "globalActions.h"
 #include "input.h"
 #include "screenDimensions.h"
@@ -17,9 +18,8 @@ static void onSelectPlay(unused struct Title *title,
 }
 
 static void onSelectScore(unused struct Title *title,
-						  unused struct ScreenController *ctrl) {
-	// TODO
-	// screen_transition(ctrl, SCREEN_SCORE);
+						  struct ScreenController *ctrl) {
+	screen_transition(ctrl, SCREEN_SCORE);
 }
 
 static void onSelectQuit(unused struct Title *title,
@@ -45,12 +45,12 @@ static struct MenuOption entries[] = {
 static int selectedEntryIdx = 0;
 constexpr int nEntries = sizeof(entries) / sizeof(*entries);
 
-void title_init(struct Title *title, struct FontLoader *fontLoader) {
+void title_init(struct Title *title, struct FontLoader *fontLoader,
+				struct AsteroidShower *asteroidShower) {
 	*title = (struct Title){
 		.fontLoader = fontLoader,
+		.asteroidShower = asteroidShower,
 	};
-
-	asteroidShower_init(&title->asteroidShower);
 }
 
 void title_destroy(unused struct Title *title) {}
@@ -65,7 +65,7 @@ static void inc_selected(int delta) {
 }
 
 void title_update(unused struct Title *title, struct ScreenController *ctrl) {
-	asteroidShower_update(&title->asteroidShower);
+	asteroidShower_update(title->asteroidShower);
 	if (input_key_once(ACTION_DOWN)) {
 		inc_selected(1);
 	}
@@ -80,32 +80,16 @@ void title_update(unused struct Title *title, struct ScreenController *ctrl) {
 	}
 }
 
-// returns the y-Axis offset
-static float drawTextCentered(struct Title *title, enum FontType type,
-							  char const *text, float maxWidth, float y,
-							  Color color) {
-	struct FontEntry fontEntry = fontLoader_get(title->fontLoader, type);
-	Vector2 dims = MeasureTextEx(fontEntry.font, text, (float)fontEntry.size,
-								 fontEntry.spacing);
-	Vector2 centeredPos = {
-		.x = maxWidth / 2 - dims.x * 0.5f,
-		.y = y,
-	};
-	DrawTextEx(fontEntry.font, text, centeredPos, (float)fontEntry.size,
-			   fontEntry.spacing, color);
-	return y + dims.y;
-}
-
 void title_draw(struct Title *title) {
 	Vector2 screenDimensions = screenDimensions_get();
 
 	ClearBackground(BLACK);
-	asteroidShower_draw(&title->asteroidShower);
+	asteroidShower_draw(title->asteroidShower);
 
 	char const *titleText = "ASTEROIDS";
 	float y = 20; // padding
-	y = drawTextCentered(title, FONT_TITLE, titleText, screenDimensions.x, y,
-						 MAROON);
+	y = draw_text_centered(title->fontLoader, FONT_TITLE, titleText,
+						   screenDimensions.x, y, MAROON);
 
 	y += 100; // padding logo
 	for (int i = 0; i < nEntries; i++) {
@@ -115,8 +99,8 @@ void title_draw(struct Title *title) {
 		} else {
 			color = RAYWHITE;
 		}
-		y = drawTextCentered(title, FONT_NORMAL, entries[i].text,
-							 screenDimensions.x, y, color);
+		y = draw_text_centered(title->fontLoader, FONT_NORMAL, entries[i].text,
+							   screenDimensions.x, y, color);
 		y += 10; // padding entries
 	}
 }
