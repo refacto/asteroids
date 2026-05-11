@@ -1,4 +1,5 @@
 #include "title.h"
+#include "drawHelpers.h"
 #include "globalActions.h"
 #include "input.h"
 #include "screenDimensions.h"
@@ -79,22 +80,6 @@ void title_update(unused struct Title *title, struct ScreenController *ctrl) {
 	}
 }
 
-// returns the y-Axis offset
-static float drawTextCentered(struct Title *title, enum FontType type,
-							  char const *text, float maxWidth, float y,
-							  Color color) {
-	struct FontEntry fontEntry = fontLoader_get(title->fontLoader, type);
-	Vector2 dims = MeasureTextEx(fontEntry.font, text, (float)fontEntry.size,
-								 fontEntry.spacing);
-	Vector2 centeredPos = {
-		.x = maxWidth / 2 - dims.x * 0.5f,
-		.y = y,
-	};
-	DrawTextEx(fontEntry.font, text, centeredPos, (float)fontEntry.size,
-			   fontEntry.spacing, color);
-	return y + dims.y;
-}
-
 void title_draw(struct Title *title) {
 	Vector2 screenDimensions = screenDimensions_get();
 
@@ -103,8 +88,8 @@ void title_draw(struct Title *title) {
 
 	char const *titleText = "ASTEROIDS";
 	float y = 20; // padding
-	y = drawTextCentered(title, FONT_TITLE, titleText, screenDimensions.x, y,
-						 MAROON);
+	y = draw_text_centered(title->fontLoader, FONT_TITLE, titleText,
+						   screenDimensions.x, y, MAROON);
 
 	y += 100; // padding logo
 	for (int i = 0; i < nEntries; i++) {
@@ -114,8 +99,8 @@ void title_draw(struct Title *title) {
 		} else {
 			color = RAYWHITE;
 		}
-		y = drawTextCentered(title, FONT_NORMAL, entries[i].text,
-							 screenDimensions.x, y, color);
+		y = draw_text_centered(title->fontLoader, FONT_NORMAL, entries[i].text,
+							   screenDimensions.x, y, color);
 		y += 10; // padding entries
 	}
 }

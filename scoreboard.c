@@ -1,4 +1,5 @@
 #include "scoreboard.h"
+#include "drawHelpers.h"
 #include "input.h"
 #include "screenDimensions.h"
 #include <raylib.h>
@@ -59,29 +60,14 @@ void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
 	scoreboard_save(scoreboard);
 }
 
-static float draw_text_centered(struct Scoreboard *scoreboard,
-								enum FontType type, const char *text,
-								float maxWidth, float y, Color color) {
-	struct FontEntry fontEntry = fontLoader_get(scoreboard->fontLoader, type);
-	Vector2 dims = MeasureTextEx(fontEntry.font, text, (float)fontEntry.size,
-								 fontEntry.spacing);
-	Vector2 pos = {
-		.x = maxWidth / 2 - dims.x * 0.5f,
-		.y = y,
-	};
-	DrawTextEx(fontEntry.font, text, pos, (float)fontEntry.size,
-			   fontEntry.spacing, color);
-	return y + dims.y;
-}
-
 void scoreboard_draw(struct Scoreboard *scoreboard) {
 	Vector2 screen = screenDimensions_get();
 	ClearBackground(BLACK);
 	asteroidShower_draw(scoreboard->asteroidShower);
 
 	float y = 20;
-	y = draw_text_centered(scoreboard, FONT_TITLE, "SCOREBOARD", screen.x, y,
-						   MAROON);
+	y = draw_text_centered(scoreboard->fontLoader, FONT_TITLE, "SCOREBOARD",
+						   screen.x, y, MAROON);
 	y += 40;
 
 	struct FontEntry fe = fontLoader_get(scoreboard->fontLoader, FONT_NORMAL);
@@ -120,8 +106,8 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 	}
 
 	y += 30;
-	draw_text_centered(scoreboard, FONT_NORMAL, "Press [Enter] to return",
-					   screen.x, y, GRAY);
+	draw_text_centered(scoreboard->fontLoader, FONT_NORMAL,
+					   "Press [Enter] to return", screen.x, y, GRAY);
 }
 
 void scoreboard_screen_update(struct ScreenController *ctrl, void *data) {

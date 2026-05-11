@@ -90,5 +90,6 @@ srcs = [
   'heart.c',
   'score.c',
   'scoreboard.c',
+  'drawHelpers.c',
 ]
 executable('asteroids', srcs, install: true, dependencies: [raylib])
