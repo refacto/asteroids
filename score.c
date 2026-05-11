@@ -1,6 +1,7 @@
 #include "score.h"
 #include "screenDimensions.h"
 #include <raylib.h>
+#include <stdint.h>
 #include <stdio.h>
 
 void score_init(struct Score *score, struct FontLoader *fontLoader) {
@@ -9,7 +10,7 @@ void score_init(struct Score *score, struct FontLoader *fontLoader) {
 	};
 }
 
-void score_add(struct Score *score, int points) {
+void score_add(struct Score *score, int32_t points) {
 	score->value += points;
 }
 
