@@ -39,20 +39,24 @@ void scoreboard_init(struct Scoreboard *scoreboard,
 
 void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
 						  int score) {
+	int insert_at = SCOREBOARD_MAX_ENTRIES;
 	for (int i = 0; i < SCOREBOARD_MAX_ENTRIES; i++) {
 		if (scoreboard->entries[i].score <= score) {
-			// Now shift everything smaller/equal down by one, we walk backwards
-			for (int j = SCOREBOARD_MAX_ENTRIES - 1; j > i; j--) {
-				scoreboard->entries[j] = scoreboard->entries[j - 1];
-			}
-			snprintf(scoreboard->entries[i].name,
-					 sizeof(scoreboard->entries[i].name), "%.*s",
-					 SCOREBOARD_NAME_LEN, name);
-			scoreboard->entries[i].score = score;
-			scoreboard_save(scoreboard);
-			return;
+			insert_at = i;
+			break;
 		}
 	}
+	if (insert_at == SCOREBOARD_MAX_ENTRIES) {
+		return; // score doesn't qualify
+	}
+	for (int i = SCOREBOARD_MAX_ENTRIES - 1; i > insert_at; i--) {
+		scoreboard->entries[i] = scoreboard->entries[i - 1];
+	}
+	snprintf(scoreboard->entries[insert_at].name,
+			 sizeof(scoreboard->entries[insert_at].name), "%.*s",
+			 SCOREBOARD_NAME_LEN, name);
+	scoreboard->entries[insert_at].score = score;
+	scoreboard_save(scoreboard);
 }
 
 static float draw_text_centered(struct Scoreboard *scoreboard,
