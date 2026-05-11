@@ -50,9 +50,10 @@ void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
 	if (insert_at == SCOREBOARD_MAX_ENTRIES) {
 		return; // score doesn't qualify
 	}
-	for (int i = SCOREBOARD_MAX_ENTRIES - 1; i > insert_at; i--) {
-		scoreboard->entries[i] = scoreboard->entries[i - 1];
-	}
+	memmove(&scoreboard->entries[insert_at + 1],
+			&scoreboard->entries[insert_at],
+			(size_t)(SCOREBOARD_MAX_ENTRIES - 1 - insert_at) *
+				sizeof(scoreboard->entries[0]));
 	snprintf(scoreboard->entries[insert_at].name,
 			 sizeof(scoreboard->entries[insert_at].name), "%.*s",
 			 SCOREBOARD_NAME_LEN, name);
