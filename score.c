@@ -11,7 +11,11 @@ void score_init(struct Score *score, struct FontLoader *fontLoader) {
 }
 
 void score_add(struct Score *score, int32_t points) {
-	score->value += points;
+	int32_t new_score = score->value + points;
+	if (new_score < 0)
+		score->value = 0;
+	else
+		score->value = new_score;
 }
 
 void score_draw(const struct Score *score) {
