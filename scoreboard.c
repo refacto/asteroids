@@ -88,7 +88,7 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 		const struct ScoreEntry *e = &scoreboard->entries[i];
 		bool empty = e->name[0] == '\0';
 		Color color = empty ? GRAY : RAYWHITE;
-		char rank[8], score[16];
+		char rank[256], score[256];
 		snprintf(rank, sizeof(rank), "%d.", i + 1);
 		if (empty) {
 			snprintf(score, sizeof(score), "---");
