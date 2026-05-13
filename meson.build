@@ -69,7 +69,7 @@ add_project_arguments(
 
 raylib = dependency('raylib')
 
-srcs = [
+srcs = files(
   'main.c',
   'game.c',
   'input.c',
@@ -91,5 +91,5 @@ srcs = [
   'score.c',
   'scoreboard.c',
   'drawHelpers.c',
-]
+)
 executable('asteroids', srcs, install: true, dependencies: [raylib])
