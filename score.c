@@ -18,10 +18,17 @@ void score_add(struct Score *score, int32_t points) {
 		score->value = new_score;
 }
 
+void score_render(const struct Score *score, char buf[static 32], int size) {
+	int n = snprintf(buf, (size_t)size, "Score: %d", score->value);
+	if (n >= size) {
+		fprintf(stderr, "score_render overflowed");
+	}
+}
+
 void score_draw(const struct Score *score) {
 	constexpr float padding = 10.0f;
 	char buf[32];
-	snprintf(buf, sizeof(buf), "Score: %d", score->value);
+	score_render(score, buf, sizeof(buf));
 	struct FontEntry fontEntry = fontLoader_get(score->fontLoader, FONT_NORMAL);
 	Vector2 dims = MeasureTextEx(fontEntry.font, buf, (float)fontEntry.size,
 								 fontEntry.spacing);

@@ -280,8 +280,18 @@ static void draw_shots(struct Game *game) {
 
 static void draw_gameOver(struct Game *game) {
 	Vector2 dims = screenDimensions_get();
-	draw_text_centered(game->fontLoader, FONT_TITLE, "GAME OVER", dims.x, 20,
-					   RED);
+	// darken the field
+	DrawRectangle(0, 0, (int)dims.x, (int)dims.y, Fade(BLACK, 0.7f));
+	float y = draw_text_centered(game->fontLoader, FONT_TITLE, "GAME OVER",
+								 dims.x, dims.y / 3, RED);
+	y += 5.0f;
+	char score[32];
+	score_render(&game->score, score, sizeof(score));
+	y = draw_text_centered(game->fontLoader, FONT_TITLE, score, dims.x, y,
+						   RAYWHITE);
+	y += 20.0f;
+	draw_text_centered(game->fontLoader, FONT_NORMAL,
+					   "Press [Enter] to continue", dims.x, y, RAYWHITE);
 }
 
 void game_draw(struct Game *game) {
@@ -294,9 +304,12 @@ void game_draw(struct Game *game) {
 	draw_shots(game);
 	player_draw(&game->player);
 	healthBar_draw(&game->healthBar);
-	score_draw(&game->score);
 	if (game->isGameOver) {
 		draw_gameOver(game);
+	} else {
+		// the score gets blown up in the game over state
+		// so we only render it if the player is still alive
+		score_draw(&game->score);
 	}
 }
 
