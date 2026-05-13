@@ -14,7 +14,8 @@ project(
 cc = meson.get_compiler('c')
 
 # sanitizers are not supported on Windows; leak sanitizer is Linux-only
-if host_machine.system() != 'windows'
+# skipped in release builds because they conflict with -D_FORTIFY_SOURCE=3
+if get_option('buildtype') != 'release' and host_machine.system() != 'windows'
   sanitize_flags = ['-fsanitize=address,undefined']
   if host_machine.system() != 'darwin'
     sanitize_flags += ['-fsanitize=leak']
