@@ -92,7 +92,18 @@ srcs = files(
   'score.c',
   'scoreboard.c',
   'drawHelpers.c',
+  'icon.c',
 )
+
+if host_machine.system() == 'windows'
+  icons_dir = 'resources' / 'icons'
+  windows = import('windows')
+  srcs += windows.compile_resources(
+    files(icons_dir / 'icon.rc'),
+    depend_files: files(icons_dir / 'icon.ico'),
+  )
+endif
+
 executable(
   'asteroids',
   srcs,

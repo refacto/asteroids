@@ -2,6 +2,7 @@
 #include "fontLoader.h"
 #include "game.h"
 #include "globalActions.h"
+#include "icon.h"
 #include "scoreboard.h"
 #include "screenController.h"
 #include "screenDimensions.h"
@@ -17,6 +18,8 @@ int main(void) {
 
 	InitWindow(screenWidth, screenHeight, "Asteroids");
 	InitAudioDevice();
+	Image icon = icon_load();
+	SetWindowIcon(icon);
 	SetTargetFPS(60);
 
 	screenDimensions_set(screenWidth, screenHeight);
@@ -68,6 +71,7 @@ int main(void) {
 	soundFx_destroy(sfx);
 	fontLoader_destroy(fontLoader);
 	CloseAudioDevice();
+	UnloadImage(icon);
 	CloseWindow();
 	return EXIT_SUCCESS;
 }
