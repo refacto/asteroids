@@ -19,6 +19,7 @@ struct Game {
 	struct HealthBar healthBar;
 	struct SoundFx *sfx;
 	struct Score score;
+	struct FontLoader *fontLoader;
 	float noHitTimer;
 };
 

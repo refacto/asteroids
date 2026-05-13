@@ -27,11 +27,11 @@ void player_thrust_inc(struct Player *player, float delta);
 bool player_is_invincible(struct Player *player);
 void player_set_invincible(struct Player *player);
 
+// deducts a life and returns if the player is still alive
+bool player_deduct_life(struct Player *player);
+
 // Returns the position where shots are fired from
 // only valid after update was called on player
 Vector2 player_cannon_position(struct Player *player);
 
 bool player_check_collision(struct Player *player, struct Asteroid *asteroid);
-
-// TODO: remove, debug
-void player_mark_shot(struct Player *player, bool shot);
