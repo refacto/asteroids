@@ -93,4 +93,10 @@ srcs = files(
   'scoreboard.c',
   'drawHelpers.c',
 )
-executable('asteroids', srcs, install: true, dependencies: [raylib])
+executable(
+  'asteroids',
+  srcs,
+  install: true,
+  dependencies: [raylib],
+  win_subsystem: 'windows', # on windows, don't spawn a console window
+)
