@@ -49,7 +49,6 @@ endif
 add_project_arguments(
   cc.get_supported_arguments(
     [
-      '-Wformat',
       '-Wformat=2',
       '-Wformat-security',
       '-Wimplicit-fallthrough',
