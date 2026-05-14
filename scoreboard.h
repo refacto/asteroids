@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asteroidShower.h"
+#include "blink.h"
 #include "fontLoader.h"
 #include "screenController.h"
 
@@ -16,16 +17,20 @@ struct Scoreboard {
 	struct ScoreEntry entries[SCOREBOARD_MAX_ENTRIES];
 	struct FontLoader *fontLoader;
 	struct AsteroidShower *asteroidShower;
+	int enteringIndex; // -1 when not entering a name
+	struct Blink cursorBlink;
 };
 
 void scoreboard_init(struct Scoreboard *scoreboard,
 					 struct FontLoader *fontLoader,
 					 struct AsteroidShower *asteroidShower);
 
-// Inserts a new entry into the top 5 if its score qualifies.
-// Lower-ranked entries shift down; the lowest may fall off.
-void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
-						  int score);
+// Reserves a row for a new entry if the score qualifies for the top 5,
+// shifting lower-ranked entries down. The row is left with an empty name
+// for the player to fill in via scoreboard_screen_update; nothing is
+// persisted until that name is committed. Returns true if a row was
+// reserved (and the scoreboard is now in name-entry mode).
+bool scoreboard_begin_entry(struct Scoreboard *scoreboard, int score);
 
 void scoreboard_draw(struct Scoreboard *scoreboard);
 

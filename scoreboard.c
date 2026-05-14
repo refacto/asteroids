@@ -34,12 +34,13 @@ void scoreboard_init(struct Scoreboard *scoreboard,
 	*scoreboard = (struct Scoreboard){
 		.fontLoader = fontLoader,
 		.asteroidShower = asteroidShower,
+		.enteringIndex = -1,
+		.cursorBlink = {.halfPeriod = 0.4f},
 	};
 	scoreboard_load(scoreboard);
 }
 
-void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
-						  int score) {
+bool scoreboard_begin_entry(struct Scoreboard *scoreboard, int score) {
 	int insert_at = SCOREBOARD_MAX_ENTRIES;
 	for (int i = 0; i < SCOREBOARD_MAX_ENTRIES; i++) {
 		if (scoreboard->entries[i].score <= score) {
@@ -48,16 +49,24 @@ void scoreboard_add_entry(struct Scoreboard *scoreboard, const char *name,
 		}
 	}
 	if (insert_at == SCOREBOARD_MAX_ENTRIES) {
-		return; // score doesn't qualify
+		return false; // score doesn't qualify
 	}
 	memmove(&scoreboard->entries[insert_at + 1],
 			&scoreboard->entries[insert_at],
 			(size_t)(SCOREBOARD_MAX_ENTRIES - 1 - insert_at) *
 				sizeof(scoreboard->entries[0]));
-	snprintf(scoreboard->entries[insert_at].name,
-			 sizeof(scoreboard->entries[insert_at].name), "%.*s",
-			 SCOREBOARD_NAME_LEN, name);
-	scoreboard->entries[insert_at].score = score;
+	scoreboard->entries[insert_at] = (struct ScoreEntry){.score = score};
+	scoreboard->enteringIndex = insert_at;
+	blink_reset(&scoreboard->cursorBlink);
+	return true;
+}
+
+static void scoreboard_commit_entry(struct Scoreboard *scoreboard) {
+	struct ScoreEntry *entry = &scoreboard->entries[scoreboard->enteringIndex];
+	if (entry->name[0] == '\0') {
+		snprintf(entry->name, sizeof(entry->name), "PLAYER");
+	}
+	scoreboard->enteringIndex = -1;
 	scoreboard_save(scoreboard);
 }
 
@@ -87,8 +96,9 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 
 	for (int i = 0; i < SCOREBOARD_MAX_ENTRIES; i++) {
 		const struct ScoreEntry *e = &scoreboard->entries[i];
-		bool empty = e->name[0] == '\0';
-		Color color = empty ? GRAY : RAYWHITE;
+		bool editing = i == scoreboard->enteringIndex;
+		bool empty = !editing && e->name[0] == '\0';
+		Color color = editing ? YELLOW : (empty ? GRAY : RAYWHITE);
 		char rank[256], score[256];
 		snprintf(rank, sizeof(rank), "%d.", i + 1);
 		if (empty) {
@@ -99,21 +109,65 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 		float scoreX = scoreEndX - MeasureTextEx(fe.font, score, fs, sp).x;
 
 		DrawTextEx(fe.font, rank, (Vector2){rankX, y}, fs, sp, color);
-		DrawTextEx(fe.font, empty ? "---" : e->name, (Vector2){nameX, y}, fs,
-				   sp, color);
+		const char *nameText = empty ? "---" : e->name;
+		DrawTextEx(fe.font, nameText, (Vector2){nameX, y}, fs, sp, color);
+		if (editing && blink_should_draw(&scoreboard->cursorBlink)) {
+			float caretX = nameX + MeasureTextEx(fe.font, e->name, fs, sp).x;
+			DrawTextEx(fe.font, "_", (Vector2){caretX, y}, fs, sp, color);
+		}
 		DrawTextEx(fe.font, score, (Vector2){scoreX, y}, fs, sp, color);
 
 		y += nameW.y + 8;
 	}
 
 	y += 30;
-	draw_text_centered(scoreboard->fontLoader, FONT_NORMAL,
-					   "Press [Enter] to return", screen.x, y, GRAY);
+	const char *prompt = scoreboard->enteringIndex >= 0
+							 ? "Type your name, [Enter] to confirm"
+							 : "Press [Enter] to return";
+	draw_text_centered(scoreboard->fontLoader, FONT_NORMAL, prompt, screen.x, y,
+					   GRAY);
 }
 
 void scoreboard_screen_update(struct ScreenController *ctrl, void *data) {
 	struct Scoreboard *scoreboard = (struct Scoreboard *)data;
 	asteroidShower_update(scoreboard->asteroidShower);
+
+	if (scoreboard->enteringIndex >= 0) {
+		blink_update(&scoreboard->cursorBlink, GetFrameTime());
+		struct ScoreEntry *entry =
+			&scoreboard->entries[scoreboard->enteringIndex];
+		size_t len = strlen(entry->name);
+
+		if (IsKeyPressed(KEY_BACKSPACE) && len > 0) {
+			entry->name[--len] = '\0';
+			blink_reset(&scoreboard->cursorBlink);
+		}
+
+		int ch;
+		while ((ch = GetCharPressed()) != 0) {
+			if (len >= SCOREBOARD_NAME_LEN) {
+				continue;
+			}
+
+			if (ch >= 'a' && ch <= 'z')
+				ch -= 'a' - 'A';
+
+			bool isUpper = ch >= 'A' && ch <= 'Z';
+			bool isDigit = ch >= '0' && ch <= '9';
+			if (!isUpper && !isDigit) {
+				continue;
+			}
+			entry->name[len++] = (char)ch;
+			entry->name[len] = '\0';
+			blink_reset(&scoreboard->cursorBlink);
+		}
+
+		if (IsKeyPressed(KEY_ENTER)) {
+			scoreboard_commit_entry(scoreboard);
+		}
+		return;
+	}
+
 	if (input_key_once(ACTION_EXECUTE)) {
 		screen_transition(ctrl, SCREEN_TITLE);
 	}

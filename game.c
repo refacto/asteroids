@@ -275,7 +275,7 @@ static void handle_game_over(struct Game *game, struct ScreenController *ctrl) {
 	if (!input_key_once(ACTION_EXECUTE)) {
 		return;
 	}
-	scoreboard_add_entry(game->scoreboard, "PLAYER", game->score.value);
+	scoreboard_begin_entry(game->scoreboard, game->score.value);
 	game_reset(game);
 	screen_transition(ctrl, SCREEN_SCORE);
 }
