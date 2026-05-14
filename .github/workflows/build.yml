@@ -76,23 +76,9 @@ jobs:
           echo "PKG_CONFIG_PATH=/tmp/raylib-install/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=/tmp/raylib-install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
-      - name: Cache LLVM (macOS)
-        if: runner.os == 'macOS'
-        id: cache-llvm
-        uses: actions/cache@v4
-        with:
-          path: |
-            /opt/homebrew/Cellar/llvm
-            /opt/homebrew/opt/llvm
-          key: llvm-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Install LLVM (macOS, cache miss)
-        if: runner.os == 'macOS' && steps.cache-llvm.outputs.cache-hit != 'true'
-        run: brew install llvm
-
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install meson raylib
+        run: brew install llvm meson raylib
 
       - name: Use Homebrew Clang (macOS)
         if: runner.os == 'macOS'
