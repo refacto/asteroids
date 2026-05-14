@@ -6,6 +6,7 @@
 #include "input.h"
 #include "player.h"
 #include "score.h"
+#include "scoreboard.h"
 #include "screenDimensions.h"
 #include "shot.h"
 #include "soundFx.h"
@@ -46,10 +47,11 @@ static struct Asteroid *new_safe_asteroid() {
 }
 
 void game_init(struct Game *game, struct SoundFx *sfx,
-			   struct FontLoader *fontLoader) {
+			   struct FontLoader *fontLoader, struct Scoreboard *scoreboard) {
 	*game = (struct Game){
 		.sfx = sfx,
 		.fontLoader = fontLoader,
+		.scoreboard = scoreboard,
 	};
 
 	score_init(&game->score, fontLoader);
@@ -191,7 +193,6 @@ static bool handle_collisions(struct Game *game) {
 			player_hit || player_check_collision(&game->player, asteroid);
 		asteroid = asteroid->next;
 	}
-	// TODO: handle life tracking
 	if (player_hit) {
 		return handle_player_collision(game);
 	}
@@ -262,11 +263,17 @@ static void game_update_alive(struct Game *game) {
 	update_no_hit_bonus(game);
 }
 
-static void game_update_dead(unused struct Game *game) {}
+static void handle_game_over(struct Game *game, struct ScreenController *ctrl) {
+	if (!input_key_once(ACTION_EXECUTE)) {
+		return;
+	}
+	scoreboard_add_entry(game->scoreboard, "PLAYER", game->score.value);
+	screen_transition(ctrl, SCREEN_SCORE);
+}
 
-void game_update(struct Game *game) {
+void game_update(struct Game *game, struct ScreenController *ctrl) {
 	if (game->isGameOver) {
-		game_update_dead(game);
+		handle_game_over(game, ctrl);
 		return;
 	}
 	game_update_alive(game);
@@ -291,7 +298,7 @@ static void draw_gameOver(struct Game *game) {
 						   RAYWHITE);
 	y += 20.0f;
 	draw_text_centered(game->fontLoader, FONT_NORMAL,
-					   "Press [Enter] to continue", dims.x, y, RAYWHITE);
+					   "Press [Enter] for scoreboard", dims.x, y, RAYWHITE);
 }
 
 void game_draw(struct Game *game) {
@@ -313,8 +320,8 @@ void game_draw(struct Game *game) {
 	}
 }
 
-void game_screen_update(unused struct ScreenController *ctrl, void *data) {
-	game_update((struct Game *)data);
+void game_screen_update(struct ScreenController *ctrl, void *data) {
+	game_update((struct Game *)data, ctrl);
 }
 
 void game_screen_draw(void *data) {

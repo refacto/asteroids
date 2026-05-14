@@ -28,14 +28,14 @@ int main(void) {
 	fontLoader_init(fontLoader);
 	struct SoundFx *sfx = &(struct SoundFx){};
 	soundFx_init(sfx);
-	struct Game *game = &(struct Game){};
-	game_init(game, sfx, fontLoader);
 	struct AsteroidShower *asteroidShower = &(struct AsteroidShower){};
 	asteroidShower_init(asteroidShower);
-	struct Title *title = &(struct Title){};
-	title_init(title, fontLoader, asteroidShower);
 	struct Scoreboard *scoreboard = &(struct Scoreboard){};
 	scoreboard_init(scoreboard, fontLoader, asteroidShower);
+	struct Game *game = &(struct Game){};
+	game_init(game, sfx, fontLoader, scoreboard);
+	struct Title *title = &(struct Title){};
+	title_init(title, fontLoader, asteroidShower);
 
 	struct ScreenController *screenController = &(struct ScreenController){};
 	screen_register(screenController, SCREEN_TITLE,
