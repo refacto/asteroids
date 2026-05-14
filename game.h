@@ -29,6 +29,7 @@ struct Game {
 void game_init(struct Game *game, struct SoundFx *sfx,
 			   struct FontLoader *fontLoader, struct Scoreboard *scoreboard);
 void game_destroy(struct Game *game);
+void game_reset(struct Game *game);
 
 void game_update(struct Game *game, struct ScreenController *ctrl);
 void game_draw(struct Game *game);

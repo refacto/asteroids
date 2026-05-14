@@ -80,6 +80,14 @@ void game_destroy(struct Game *game) {
 	}
 }
 
+void game_reset(struct Game *game) {
+	struct SoundFx *sfx = game->sfx;
+	struct FontLoader *fontLoader = game->score.fontLoader;
+	struct Scoreboard *scoreboard = game->scoreboard;
+	game_destroy(game);
+	game_init(game, sfx, fontLoader, scoreboard);
+}
+
 static struct Shot *get_inactive_shot(struct Game *game) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		struct Shot *cur = &game->shots[i];
@@ -268,6 +276,7 @@ static void handle_game_over(struct Game *game, struct ScreenController *ctrl) {
 		return;
 	}
 	scoreboard_add_entry(game->scoreboard, "PLAYER", game->score.value);
+	game_reset(game);
 	screen_transition(ctrl, SCREEN_SCORE);
 }
 
