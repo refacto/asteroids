@@ -14,3 +14,6 @@ build/
 # clangd / compile commands (generated)
 compile_commands.json
 .vscode
+
+# game files
+scores.dat
