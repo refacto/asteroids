@@ -9,9 +9,19 @@ static_assert((sizeof audiowideTTF) >= 4,
 			  "There should be at least 4 elements in this array.");
 constexpr size_t audiowideSize = sizeof(audiowideTTF);
 
+// Basic ASCII (32-126) + Latin-1 Supplement (160-255) so common accented
+// characters have glyphs in the atlas instead of rendering as "?".
+constexpr int LATIN_CODEPOINT_COUNT = (126 - 32 + 1) + (255 - 160 + 1);
+
 static Font load_audiowide(int size) {
-	return LoadFontFromMemory(".ttf", audiowideTTF, audiowideSize, size,
-							  nullptr, 0);
+	int cps[LATIN_CODEPOINT_COUNT];
+	int idx = 0;
+	for (int c = 32; c <= 126; c++)
+		cps[idx++] = c;
+	for (int c = 160; c <= 255; c++)
+		cps[idx++] = c;
+	return LoadFontFromMemory(".ttf", audiowideTTF, audiowideSize, size, cps,
+							  LATIN_CODEPOINT_COUNT);
 }
 
 void fontLoader_init(struct FontLoader *loader) {
