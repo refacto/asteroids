@@ -61,13 +61,58 @@ bool scoreboard_begin_entry(struct Scoreboard *scoreboard, int score) {
 	return true;
 }
 
-static void scoreboard_commit_entry(struct Scoreboard *scoreboard) {
-	struct ScoreEntry *entry = &scoreboard->entries[scoreboard->enteringIndex];
-	if (entry->name[0] == '\0') {
-		snprintf(entry->name, sizeof(entry->name), "PLAYER");
-	}
+static void scoreboard_end_entry(struct Scoreboard *scoreboard) {
 	scoreboard->enteringIndex = -1;
 	scoreboard_save(scoreboard);
+}
+
+// Walk back over UTF-8 continuation bytes (10xxxxxx) to find the start of
+// the codepoint that ends at pos.
+static size_t utf8_prev_boundary(const char *s, size_t pos) {
+	while (pos > 0) {
+		pos--;
+		if (((unsigned char)s[pos] & 0xC0) != 0x80)
+			break;
+	}
+	return pos;
+}
+
+static void scoreboard_handle_input(struct Scoreboard *scoreboard) {
+	blink_update(&scoreboard->cursorBlink, GetFrameTime());
+	struct ScoreEntry *entry = &scoreboard->entries[scoreboard->enteringIndex];
+
+	if (IsKeyPressed(KEY_BACKSPACE)) {
+		size_t len = strlen(entry->name);
+		if (len > 0) {
+			entry->name[utf8_prev_boundary(entry->name, len)] = '\0';
+		}
+	}
+
+	int cp;
+	while ((cp = GetCharPressed()) != 0) {
+		int size = 0;
+		const char *bytes = CodepointToUTF8(cp, &size);
+		size_t len = strlen(entry->name);
+		if (size <= 0 || len + (size_t)size > SCOREBOARD_NAME_LEN) {
+			continue;
+		}
+		memcpy(entry->name + len, bytes, (size_t)size);
+		entry->name[len + (size_t)size] = '\0';
+	}
+
+	if (IsKeyPressed(KEY_ENTER) && entry->name[0] != '\0') {
+		scoreboard_end_entry(scoreboard);
+	}
+}
+
+static void scoreboard_draw_caret(const struct Scoreboard *scoreboard,
+								  const struct ScoreEntry *entry, Font font,
+								  float fs, float sp, float nameX, float y,
+								  Color color) {
+	if (!blink_should_draw(&scoreboard->cursorBlink))
+		return;
+	float caretX = nameX + MeasureTextEx(font, entry->name, fs, sp).x;
+	DrawTextEx(font, "_", (Vector2){caretX, y}, fs, sp, color);
 }
 
 void scoreboard_draw(struct Scoreboard *scoreboard) {
@@ -111,9 +156,9 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 		DrawTextEx(fe.font, rank, (Vector2){rankX, y}, fs, sp, color);
 		const char *nameText = empty ? "---" : e->name;
 		DrawTextEx(fe.font, nameText, (Vector2){nameX, y}, fs, sp, color);
-		if (editing && blink_should_draw(&scoreboard->cursorBlink)) {
-			float caretX = nameX + MeasureTextEx(fe.font, e->name, fs, sp).x;
-			DrawTextEx(fe.font, "_", (Vector2){caretX, y}, fs, sp, color);
+		if (editing) {
+			scoreboard_draw_caret(scoreboard, e, fe.font, fs, sp, nameX, y,
+								  color);
 		}
 		DrawTextEx(fe.font, score, (Vector2){scoreX, y}, fs, sp, color);
 
@@ -133,38 +178,7 @@ void scoreboard_screen_update(struct ScreenController *ctrl, void *data) {
 	asteroidShower_update(scoreboard->asteroidShower);
 
 	if (scoreboard->enteringIndex >= 0) {
-		blink_update(&scoreboard->cursorBlink, GetFrameTime());
-		struct ScoreEntry *entry =
-			&scoreboard->entries[scoreboard->enteringIndex];
-		size_t len = strlen(entry->name);
-
-		if (IsKeyPressed(KEY_BACKSPACE) && len > 0) {
-			entry->name[--len] = '\0';
-			blink_reset(&scoreboard->cursorBlink);
-		}
-
-		int ch;
-		while ((ch = GetCharPressed()) != 0) {
-			if (len >= SCOREBOARD_NAME_LEN) {
-				continue;
-			}
-
-			if (ch >= 'a' && ch <= 'z')
-				ch -= 'a' - 'A';
-
-			bool isUpper = ch >= 'A' && ch <= 'Z';
-			bool isDigit = ch >= '0' && ch <= '9';
-			if (!isUpper && !isDigit) {
-				continue;
-			}
-			entry->name[len++] = (char)ch;
-			entry->name[len] = '\0';
-			blink_reset(&scoreboard->cursorBlink);
-		}
-
-		if (IsKeyPressed(KEY_ENTER)) {
-			scoreboard_commit_entry(scoreboard);
-		}
+		scoreboard_handle_input(scoreboard);
 		return;
 	}
 

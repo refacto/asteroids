@@ -28,8 +28,8 @@ void scoreboard_init(struct Scoreboard *scoreboard,
 // Reserves a row for a new entry if the score qualifies for the top 5,
 // shifting lower-ranked entries down. The row is left with an empty name
 // for the player to fill in via scoreboard_screen_update; nothing is
-// persisted until that name is committed. Returns true if a row was
-// reserved (and the scoreboard is now in name-entry mode).
+// persisted until the entry is ended. Returns true if a row was reserved
+// (and the scoreboard is now in name-entry mode).
 bool scoreboard_begin_entry(struct Scoreboard *scoreboard, int score);
 
 void scoreboard_draw(struct Scoreboard *scoreboard);
