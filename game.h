@@ -4,14 +4,13 @@
 #include "healthBar.h"
 #include "player.h"
 #include "score.h"
+#include "scoreboard.h"
 #include "screenController.h"
 #include "shot.h"
 #include "soundFx.h"
 #include <raylib.h>
 
 constexpr int MAX_NUM_SHOTS = 5;
-
-struct Scoreboard;
 
 struct Game {
 	bool isGameOver;
