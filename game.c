@@ -1,5 +1,7 @@
 #include "game.h"
 #include "asteroid.h"
+#include "drawHelpers.h"
+#include "fontLoader.h"
 #include "healthBar.h"
 #include "input.h"
 #include "player.h"
@@ -47,6 +49,7 @@ void game_init(struct Game *game, struct SoundFx *sfx,
 			   struct FontLoader *fontLoader) {
 	*game = (struct Game){
 		.sfx = sfx,
+		.fontLoader = fontLoader,
 	};
 
 	score_init(&game->score, fontLoader);
@@ -162,7 +165,16 @@ static bool collide_asteroid_shots(struct Game *game,
 	return true;
 }
 
-static void handle_collisions(struct Game *game) {
+static bool handle_player_collision(struct Game *game) {
+	game->noHitTimer = 0;
+	soundFx_play(game->sfx, SFX_PLAYER_HIT);
+	player_set_invincible(&game->player);
+	bool isAlive = player_deduct_life(&game->player);
+	return isAlive;
+}
+
+// returns false if player died
+static bool handle_collisions(struct Game *game) {
 	bool player_hit = false;
 	struct Asteroid *asteroid = game->asteroids;
 	while (asteroid) {
@@ -181,11 +193,9 @@ static void handle_collisions(struct Game *game) {
 	}
 	// TODO: handle life tracking
 	if (player_hit) {
-		soundFx_play(game->sfx, SFX_PLAYER_HIT);
-		player_set_invincible(&game->player);
-		game->noHitTimer = 0;
+		return handle_player_collision(game);
 	}
-	player_mark_shot(&game->player, player_hit);
+	return true;
 }
 
 // returns a position that makes an object out of bounds
@@ -241,21 +251,47 @@ static void update_no_hit_bonus(struct Game *game) {
 	}
 }
 
-void game_update(struct Game *game) {
+static void game_update_alive(struct Game *game) {
 	respawn_enemies(game);
 	update_asteroids(game);
 	player_update(&game->player);
 	update_shots(game);
-	handle_collisions(game);
+	game->isGameOver = !handle_collisions(game);
 	healthBar_set_num_lifes(&game->healthBar, game->player.lives);
 	handle_input(game);
 	update_no_hit_bonus(game);
+}
+
+static void game_update_dead(unused struct Game *game) {}
+
+void game_update(struct Game *game) {
+	if (game->isGameOver) {
+		game_update_dead(game);
+		return;
+	}
+	game_update_alive(game);
 }
 
 static void draw_shots(struct Game *game) {
 	for (int i = 0; i < MAX_NUM_SHOTS; i++) {
 		shot_draw(&game->shots[i]);
 	}
+}
+
+static void draw_gameOver(struct Game *game) {
+	Vector2 dims = screenDimensions_get();
+	// darken the field
+	DrawRectangle(0, 0, (int)dims.x, (int)dims.y, Fade(BLACK, 0.7f));
+	float y = draw_text_centered(game->fontLoader, FONT_TITLE, "GAME OVER",
+								 dims.x, dims.y / 3, RED);
+	y += 5.0f;
+	char score[32];
+	score_render(&game->score, score, sizeof(score));
+	y = draw_text_centered(game->fontLoader, FONT_TITLE, score, dims.x, y,
+						   RAYWHITE);
+	y += 20.0f;
+	draw_text_centered(game->fontLoader, FONT_NORMAL,
+					   "Press [Enter] to continue", dims.x, y, RAYWHITE);
 }
 
 void game_draw(struct Game *game) {
@@ -268,7 +304,13 @@ void game_draw(struct Game *game) {
 	draw_shots(game);
 	player_draw(&game->player);
 	healthBar_draw(&game->healthBar);
-	score_draw(&game->score);
+	if (game->isGameOver) {
+		draw_gameOver(game);
+	} else {
+		// the score gets blown up in the game over state
+		// so we only render it if the player is still alive
+		score_draw(&game->score);
+	}
 }
 
 void game_screen_update(unused struct ScreenController *ctrl, void *data) {

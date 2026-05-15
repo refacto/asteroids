@@ -120,14 +120,6 @@ void player_thrust_inc(struct Player *player, float delta) {
 	object_thrust_inc(&player->object, delta);
 }
 
-void player_mark_shot(struct Player *player, bool shot) {
-	if (shot) {
-		player->object.color = RED;
-		return;
-	}
-	player->object.color = WHITE;
-}
-
 bool player_check_collision(struct Player *player, struct Asteroid *asteroid) {
 	if (player_is_invincible(player)) {
 		return false;
@@ -151,4 +143,9 @@ bool player_is_invincible(struct Player *player) {
 
 void player_set_invincible(struct Player *player) {
 	player->invincibilityTimer = INVINCIBILITY_DURATION;
+}
+
+bool player_deduct_life(struct Player *player) {
+	player->lives--;
+	return player->lives > 0;
 }
