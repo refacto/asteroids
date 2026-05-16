@@ -7,11 +7,11 @@
 
 constexpr int SCOREBOARD_MAX_ENTRIES = 5;
 constexpr int SCOREBOARD_NAME_MAX_CODEPOINTS = 12;
-// Worst case UTF-8 is 4 bytes per codepoint; reserve enough room plus NUL.
+// Worst case UTF-8 is 4 bytes per codepoint.
 constexpr int SCOREBOARD_NAME_BYTES = SCOREBOARD_NAME_MAX_CODEPOINTS * 4;
 
 struct ScoreEntry {
-	char name[SCOREBOARD_NAME_BYTES + 1];
+	char name[SCOREBOARD_NAME_BYTES + 1]; // + 1 for NUL terminator
 	int score;
 };
 
