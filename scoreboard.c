@@ -36,6 +36,7 @@ void scoreboard_init(struct Scoreboard *scoreboard,
 		.asteroidShower = asteroidShower,
 		.enteringIndex = -1,
 		.cursorBlink = {.halfPeriod = 0.4f},
+		.letterCounter = 0,
 	};
 	scoreboard_load(scoreboard);
 }
@@ -58,6 +59,7 @@ bool scoreboard_begin_entry(struct Scoreboard *scoreboard, int score) {
 	scoreboard->entries[insert_at] = (struct ScoreEntry){.score = score};
 	scoreboard->enteringIndex = insert_at;
 	blink_reset(&scoreboard->cursorBlink);
+	scoreboard->letterCounter = 0;
 	return true;
 }
 
@@ -85,6 +87,7 @@ static void scoreboard_handle_input(struct Scoreboard *scoreboard) {
 		size_t len = strlen(entry->name);
 		if (len > 0) {
 			entry->name[utf8_prev_boundary(entry->name, len)] = '\0';
+			scoreboard->letterCounter--;
 		}
 	}
 
@@ -93,11 +96,15 @@ static void scoreboard_handle_input(struct Scoreboard *scoreboard) {
 		int size = 0;
 		const char *bytes = CodepointToUTF8(cp, &size);
 		size_t len = strlen(entry->name);
-		if (size <= 0 || len + (size_t)size > SCOREBOARD_NAME_LEN) {
+		if (size <= 0 || len + (size_t)size + 1 > sizeof(entry->name)) {
+			continue;
+		}
+		if (scoreboard->letterCounter >= SCOREBOARD_NAME_MAX_CODEPOINTS) {
 			continue;
 		}
 		memcpy(entry->name + len, bytes, (size_t)size);
 		entry->name[len + (size_t)size] = '\0';
+		scoreboard->letterCounter++;
 	}
 
 	if (IsKeyPressed(KEY_ENTER) && entry->name[0] != '\0') {
@@ -132,9 +139,9 @@ void scoreboard_draw(struct Scoreboard *scoreboard) {
 	// Measure each column at its widest possible content so they line up
 	// regardless of which characters happen to render in any given row.
 	float rankW = MeasureTextEx(fe.font, "5.", fs, sp).x;
-	Vector2 nameW = MeasureTextEx(fe.font, "WWWWWWWW", fs, sp);
+	Vector2 nameW = MeasureTextEx(fe.font, "WWWWWWWWWWWW", fs, sp);
 	float scoreW = MeasureTextEx(fe.font, "999999", fs, sp).x;
-	float gap = nameW.x / 8;
+	float gap = nameW.x / 12;
 	float rankX = (screen.x - (rankW + nameW.x + scoreW + 2 * gap)) / 2;
 	float nameX = rankX + rankW + gap;
 	float scoreEndX = nameX + nameW.x + gap + scoreW;

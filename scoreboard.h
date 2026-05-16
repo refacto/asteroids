@@ -6,10 +6,12 @@
 #include "screenController.h"
 
 constexpr int SCOREBOARD_MAX_ENTRIES = 5;
-constexpr int SCOREBOARD_NAME_LEN = 8;
+constexpr int SCOREBOARD_NAME_MAX_CODEPOINTS = 12;
+// Worst case UTF-8 is 4 bytes per codepoint; reserve enough room plus NUL.
+constexpr int SCOREBOARD_NAME_BYTES = SCOREBOARD_NAME_MAX_CODEPOINTS * 4;
 
 struct ScoreEntry {
-	char name[SCOREBOARD_NAME_LEN + 1];
+	char name[SCOREBOARD_NAME_BYTES + 1];
 	int score;
 };
 
@@ -19,6 +21,7 @@ struct Scoreboard {
 	struct AsteroidShower *asteroidShower;
 	int enteringIndex; // -1 when not entering a name
 	struct Blink cursorBlink;
+	int letterCounter;
 };
 
 void scoreboard_init(struct Scoreboard *scoreboard,
